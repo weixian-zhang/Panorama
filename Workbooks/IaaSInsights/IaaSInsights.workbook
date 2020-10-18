@@ -1,0 +1,1109 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
+        "parameters": [
+          {
+            "id": "6a1ae947-c340-460f-94e5-cba8f0763c85",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "value": [
+              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "includeAll": true,
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1"
+          },
+          {
+            "id": "e208af3f-9a21-4297-a827-2aa2f5bc1a2b",
+            "version": "KqlParameterItem/1.0",
+            "name": "Workspaces",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "",
+            "delimiter": ",",
+            "query": "where type =~ 'microsoft.operationalinsights/workspaces'\n| order by name asc\n| project value = id, label = id",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": [
+              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352/resourceGroups/CH-OpsRG-Pri/providers/Microsoft.OperationalInsights/workspaces/CH-LA"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "c6f728a4-7f54-4a1a-b73b-12ae2397d557",
+            "version": "KqlParameterItem/1.0",
+            "name": "VirtualMachines",
+            "label": "Virtual Machine",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "",
+            "delimiter": ",",
+            "query": "where type =~ 'microsoft.compute/virtualmachines'\r\n\t| order by name asc\r\n\t| project value = id, label = id //, selected = Rank <= 25\r\n//where type =~ 'microsoft.compute/virtualmachines'\r\n\t//| order by name asc\r\n\t//| extend Rank = row_number()\r\n\t//| project value = id, label = id, selected = Rank <= 25",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1",
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "16857f85-f4ab-435a-8a86-d4929685a1b4",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time Range",
+            "type": 4,
+            "isRequired": true,
+            "value": {
+              "durationMs": 604800000
+            },
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ]
+            }
+          },
+          {
+            "id": "3e94595d-17f5-4ee0-a44c-beb516381b9b",
+            "version": "KqlParameterItem/1.0",
+            "name": "VMSelectionCount",
+            "type": 1,
+            "query": "where type == 'microsoft.compute/virtualmachines' \r\n| summarize Selected = countif(id in ({VirtualMachines:value})), Total = count()\r\n| extend Selected = iff(Selected > 200, 200, Selected)\r\n| project Message = strcat('Selected VMs: ', Selected, ' / ', Total)",
+            "crossComponentResources": [
+              "{VirtualMachines}"
+            ],
+            "isHiddenWhenLocked": true,
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "parameters - 0"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "102a8a0b-1cfb-4375-a088-a9ad87b9812f",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Availability",
+            "subTarget": "Availability",
+            "style": "link"
+          },
+          {
+            "id": "ad88a470-cef1-4032-96d5-07efefab8abd",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "CPU & Memory",
+            "subTarget": "CPUMemory",
+            "style": "link"
+          },
+          {
+            "id": "d7d54851-963f-4161-be21-369450173d8f",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Disk Capacity",
+            "subTarget": "DiskCapacity",
+            "style": "link"
+          },
+          {
+            "id": "9eb15743-19d0-426a-9e43-95f9fdd45069",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Patch Status",
+            "subTarget": "PatchStatus",
+            "style": "link"
+          },
+          {
+            "id": "a1276654-573c-4290-ad46-014be6c34fda",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Backup Status",
+            "subTarget": "BackupStatus",
+            "style": "link"
+          },
+          {
+            "id": "237bb0b7-1715-4094-b5b0-7c0ed405576d",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Change Track",
+            "subTarget": "ChangeTrack",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "{\"version\":\"AzureHealthQuery/1.0\",\"queryType\":\"Detailed\"}",
+        "size": 0,
+        "title": "VM Availability",
+        "queryType": 4,
+        "resourceType": "microsoft.compute/virtualmachines",
+        "crossComponentResources": [
+          "{VirtualMachines}"
+        ],
+        "visualization": "graph",
+        "graphSettings": {
+          "type": 2,
+          "topContent": {
+            "columnMatch": "Availability state"
+          },
+          "centerContent": {
+            "columnMatch": "Name",
+            "formatter": 13,
+            "formatOptions": {
+              "linkTarget": "Resource",
+              "subTarget": "resourcehealth",
+              "linkIsContextBlade": false,
+              "showIcon": false
+            }
+          },
+          "bottomContent": {
+            "columnMatch": "Reason type"
+          },
+          "nodeIdField": "Name",
+          "graphOrientation": 3,
+          "showOrientationToggles": false,
+          "nodeSize": null,
+          "staticNodeSize": 100,
+          "colorSettings": {
+            "nodeColorField": "Availability state",
+            "type": 3,
+            "thresholdsGrid": [
+              {
+                "operator": "==",
+                "thresholdValue": "Available",
+                "representation": "green"
+              },
+              {
+                "operator": "Default",
+                "thresholdValue": null,
+                "representation": "orange"
+              }
+            ]
+          },
+          "hivesMargin": 5
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "Availability"
+      },
+      "name": "StepName-Availability"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "InsightsMetrics\r\n| where Namespace == \"Memory\" and Name == \"AvailableMB\" and TimeGenerated {TimeRange:value}\r\n| extend SplitRscId = split(_ResourceId, \"/\")\r\n| extend ResourceGroup = SplitRscId[4]\r\n| extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])\r\n| extend DomainName = Computer\r\n| extend AvailableGB = round(Val/1000,1)\r\n| extend TotalMemoryGB = round(todecimal(tostring(parse_json(Tags)[\"vm.azm.ms/memorySizeMB\"])) / 1000,1)\r\n| where VMName in (split(tolower(\"{VirtualMachines:name}\"), \", \"))\r\n| summarize AvailableGB=min(AvailableGB) by tostring(ResourceGroup), VMName, DomainName, TotalMemoryGB, CompositeMemDiff=TotalMemoryGB\r\n| join kind=inner \r\n  ( InsightsMetrics\r\n    | where Namespace == \"Processor\" and Name == \"UtilizationPercentage\"\r\n    and TimeGenerated {TimeRange:value}\r\n    | extend SplitRscId = split(_ResourceId, \"/\")\r\n    | extend DomainName = Computer\r\n    | extend Cores = tostring(parse_json(Tags)[\"vm.azm.ms/totalCpus\"])\r\n    | extend CPUPercent = round(Val,1)\r\n    | extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])\r\n    | summarize CPUPercent=min(CPUPercent) by VMName, DomainName, Cores\r\n  )\r\n  on VMName\r\n| project ResourceGroup, VMName, DomainName, Cores, CPUPercent, AvailableGB, TotalMemoryGB, CompositeMemDiff=TotalMemoryGB",
+        "size": 0,
+        "title": "CPU & Memory",
+        "timeContext": {
+          "durationMs": 604800000
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspaces}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "$gen_group",
+              "formatter": 13,
+              "formatOptions": {
+                "linkTarget": null,
+                "showIcon": true,
+                "customColumnWidthSetting": "21ch"
+              }
+            },
+            {
+              "columnMatch": "ResourceGroup",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "VMName",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "20ch"
+              }
+            },
+            {
+              "columnMatch": "DomainName",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "30ch"
+              }
+            },
+            {
+              "columnMatch": "CPUPercent",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": ">=",
+                    "thresholdValue": "90",
+                    "representation": "redBright",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "turquoise",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "AvailableGB",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "TotalMemoryGB",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "CompositeMemDiff",
+              "formatter": 22,
+              "formatOptions": {
+                "compositeBarSettings": {
+                  "labelText": "[\"AvailableGB\"]GB free out of [\"TotalMemoryGB\"]GB",
+                  "columnSettings": [
+                    {
+                      "columnName": "AvailableGB",
+                      "color": "blue"
+                    },
+                    {
+                      "columnName": "TotalMemoryGB",
+                      "color": "gray"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "filter": true,
+          "hierarchySettings": {
+            "treeType": 1,
+            "groupBy": [
+              "ResourceGroup"
+            ],
+            "expandTopLevel": true
+          },
+          "labelSettings": [
+            {
+              "columnId": "ResourceGroup"
+            },
+            {
+              "columnId": "VMName",
+              "label": "Virtual Machine"
+            },
+            {
+              "columnId": "DomainName",
+              "label": "Domain Name"
+            },
+            {
+              "columnId": "Cores"
+            },
+            {
+              "columnId": "CPUPercent",
+              "label": "Current CPU %"
+            },
+            {
+              "columnId": "AvailableGB"
+            },
+            {
+              "columnId": "TotalMemoryGB"
+            },
+            {
+              "columnId": "CompositeMemDiff",
+              "label": "Memory (GB)"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "CPUMemory"
+      },
+      "name": "StepName-CPUMemory"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Perf\r\n| where ObjectName == \"LogicalDisk\" \r\n| where CounterName == \"Free Megabytes\" and \r\n  InstanceName !in (\"_Total\") and InstanceName !contains \"HarddiskVolume\" and TimeGenerated {TimeRange:value}\r\n| extend SplitRscId = split(_ResourceId, \"/\")\r\n| where SplitRscId[(array_length(SplitRscId) - 4)] != \"virtualmachinescalesets\"\r\n| extend DomainName = Computer\r\n| extend FreeSpaceGB = round((CounterValue / 1000),1)\r\n| extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])\r\n| where VMName in (split(tolower(\"{VirtualMachines:name}\"), \", \"))\r\n| summarize round(min(FreeSpaceGB), 1) by VMName, DomainName, InstanceName //, SVMs\r\n| join kind=inner \r\n  (Perf\r\n        | where ObjectName == \"LogicalDisk\" and\r\n          CounterName == \"% Free Space\" and\r\n          TimeGenerated {TimeRange:value}\r\n        | extend DomainName = Computer\r\n        | extend FreePercent = round(CounterValue,1)\r\n        | extend UsedPercent = round((100 - FreePercent),1)\r\n        | extend Total = FreePercent + UsedPercent\r\n        | summarize min(FreePercent), min(UsedPercent) by DomainName, Total\r\n   ) on DomainName",
+        "size": 0,
+        "title": "Disk Capacity",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspaces}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "$gen_group",
+              "formatter": 13,
+              "formatOptions": {
+                "linkTarget": null,
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "VMName",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "InstanceName",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "19ch"
+              }
+            },
+            {
+              "columnMatch": "min_FreeSpaceGB",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "<=",
+                    "thresholdValue": "15",
+                    "representation": "redBright",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "turquoise",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "DomainName1",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "Total",
+              "formatter": 5,
+              "formatOptions": {
+                "compositeBarSettings": {
+                  "labelText": "[\"min_UsedPercent\"] Used, [\"min_FreePercent\"] Free",
+                  "columnSettings": [
+                    {
+                      "columnName": "min_UsedPercent",
+                      "color": "gray"
+                    },
+                    {
+                      "columnName": "min_FreePercent",
+                      "color": "blue"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "columnMatch": "FreePercent",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "UsedPercent",
+              "formatter": 5,
+              "formatOptions": {
+                "compositeBarSettings": {
+                  "labelText": "sss",
+                  "columnSettings": [
+                    {
+                      "columnName": "UsedPercent",
+                      "color": "blue"
+                    },
+                    {
+                      "columnName": "FreePercent",
+                      "color": "blue"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "columnMatch": "Space %",
+              "formatter": 22,
+              "formatOptions": {
+                "compositeBarSettings": {
+                  "labelText": "[\"min_UsedPercent\"] Used, [\"min_FreePercent\"] Free",
+                  "columnSettings": [
+                    {
+                      "columnName": "min_UsedPercent",
+                      "color": "gray"
+                    },
+                    {
+                      "columnName": "min_FreePercent",
+                      "color": "blue"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "filter": true,
+          "hierarchySettings": {
+            "treeType": 1,
+            "groupBy": [
+              "VMName"
+            ],
+            "expandTopLevel": true
+          },
+          "labelSettings": [
+            {
+              "columnId": "VMName",
+              "label": "Virtual Machine"
+            },
+            {
+              "columnId": "DomainName",
+              "label": "Domain Name"
+            },
+            {
+              "columnId": "InstanceName",
+              "label": "Logical Drive"
+            },
+            {
+              "columnId": "min_FreeSpaceGB",
+              "label": "Free Space (GB)"
+            },
+            {
+              "columnId": "DomainName1"
+            },
+            {
+              "columnId": "min_FreePercent",
+              "label": "FreeSpacePercent"
+            },
+            {
+              "columnId": "min_UsedPercent",
+              "label": "UsedSpacePercent"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "DiskCapacity"
+      },
+      "name": "StepName-DiskCapacity",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 11,
+            "content": {
+              "version": "LinkItem/1.0",
+              "style": "tabs",
+              "links": [
+                {
+                  "id": "5a061817-6229-4d29-9245-66c171adbc9d",
+                  "cellValue": "selectedPatchTab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Linux",
+                  "subTarget": "LinuxPatch",
+                  "style": "link"
+                },
+                {
+                  "id": "55503f4c-134b-4d57-b002-162be0e167cf",
+                  "cellValue": "selectedPatchTab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Windows",
+                  "subTarget": "WindowsPatch",
+                  "style": "link"
+                }
+              ]
+            },
+            "name": "links - 0"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Update\r\n| where TimeGenerated>ago(5h) and OSType==\"Linux\"\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification) by Computer, SourceComputerId, Product, ProductArch\r\n| where UpdateState=~\"Needed\"\r\n| summarize by Product, ProductArch, Classification, Computer\r\n| summarize count(Classification) by Computer",
+              "size": 0,
+              "title": "Patch Required By VM",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart"
+            },
+            "customWidth": "50",
+            "conditionalVisibilities": [
+              {
+                "parameterName": "selectedTab",
+                "comparison": "isEqualTo",
+                "value": "PatchStatus"
+              },
+              {
+                "parameterName": "selectedPatchTab",
+                "comparison": "isEqualTo",
+                "value": "LinuxPatch"
+              }
+            ],
+            "name": "query - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Update\r\n| where TimeGenerated>ago(5h) and OSType==\"Linux\"\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification) by Computer, SourceComputerId, Product, ProductArch\r\n| where UpdateState=~\"Needed\"\r\n| summarize by Product, ProductArch, Classification, Computer\r\n| summarize count(Classification) by Classification",
+              "size": 0,
+              "title": "Patch By Classification",
+              "timeContext": {
+                "durationMs": 604800000
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart",
+              "chartSettings": {
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Others",
+                    "color": "magenta"
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "conditionalVisibilities": [
+              {
+                "parameterName": "selectedTab",
+                "comparison": "isEqualTo",
+                "value": "PatchStatus"
+              },
+              {
+                "parameterName": "selectedPatchTab",
+                "comparison": "isEqualTo",
+                "value": "LinuxPatch"
+              }
+            ],
+            "name": "query - 2"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Heartbeat\r\n| where TimeGenerated {TimeRange} and OSType==\"Linux\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions, Computer, ResourceId, ComputerEnvironment, VMUUID) by SourceComputerId\r\n| where Solutions has \"updates\"\r\n| extend vmuuId=VMUUID, azureResourceId=ResourceId, osType=1, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), scopedToUpdatesSolution=true, lastUpdateAgentSeenTime=\"\"\r\n| join kind=leftouter\r\n(\r\n    Update\r\n    | where TimeGenerated {TimeRange} and OSType==\"Linux\" and SourceComputerId in ((Heartbeat\r\n    | where TimeGenerated  {TimeRange} and OSType==\"Linux\" and notempty(Computer)\r\n    | summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n    | where Solutions has \"updates\"\r\n    | distinct SourceComputerId))\r\n    | summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification, Product, Computer, ComputerEnvironment) by SourceComputerId, Product, ProductArch\r\n    | summarize Computer=any(Computer), ComputerEnvironment=any(ComputerEnvironment), missingCriticalUpdatesCount=countif(Classification has \"Critical\" and UpdateState=~\"Needed\"), missingSecurityUpdatesCount=countif(Classification has \"Security\" and UpdateState=~\"Needed\"), missingOtherUpdatesCount=countif(Classification !has \"Critical\" and Classification !has \"Security\" and UpdateState=~\"Needed\"), lastAssessedTime=max(TimeGenerated), lastUpdateAgentSeenTime=\"\" by SourceComputerId\r\n    | extend compliance=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0, 2, 1)\r\n    | extend ComplianceOrder=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0 or missingOtherUpdatesCount > 0, 1, 3)\r\n)\r\non SourceComputerId\r\n| project displayName=Computer, CriticalUpdates=coalesce(missingCriticalUpdatesCount, 0), SecurityUpdates=coalesce(missingSecurityUpdatesCount, 0), OtherUpdates=coalesce(missingOtherUpdatesCount, 0),\r\n environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), lastAssessedTime, lastUpdateAgentSeenTime\r\n//| extend osType = replace(@\"1\", @\"Linux\", tostring(osType))\r\n| extend environment = replace(@\"2\", @\"Non-Azure\", tostring(environment))\r\n| extend environment = replace(@\"1\", @\"Azure\", tostring(environment))",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "exportFieldName": "displayName",
+              "exportParameterName": "SelectedComputer",
+              "exportDefaultValue": "All Computers",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "displayName",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "OtherUpdates",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "greenBlue"
+                    }
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "displayName",
+                    "label": "VM"
+                  },
+                  {
+                    "columnId": "CriticalUpdates",
+                    "label": "Critical Updates"
+                  },
+                  {
+                    "columnId": "SecurityUpdates"
+                  },
+                  {
+                    "columnId": "OtherUpdates"
+                  },
+                  {
+                    "columnId": "environment"
+                  },
+                  {
+                    "columnId": "lastAssessedTime"
+                  },
+                  {
+                    "columnId": "lastUpdateAgentSeenTime"
+                  }
+                ]
+              }
+            },
+            "conditionalVisibilities": [
+              {
+                "parameterName": "selectedTab",
+                "comparison": "isEqualTo",
+                "value": "PatchStatus"
+              },
+              {
+                "parameterName": "selectedPatchTab",
+                "comparison": "isEqualTo",
+                "value": "LinuxPatch"
+              }
+            ],
+            "name": "query - 3"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Update\r\n| where TimeGenerated  {TimeRange} and OSType==\"Linux\" and Computer == '{SelectedComputer}'\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification, BulletinUrl, BulletinID) by Computer, SourceComputerId, Product, ProductArch\r\n| where UpdateState=~\"Needed\"\r\n| project-away UpdateState, TimeGenerated\r\n| summarize computersCount=dcount(SourceComputerId, 2), ClassificationWeight=max(iff(Classification has \"Critical\", 4, iff(Classification has \"Security\", 2, 1))) by Computer, id=strcat(Product, \"_\", ProductArch), displayName=Product, productArch=ProductArch, classification=Classification, InformationId=BulletinID, InformationUrl=tostring(split(BulletinUrl, \";\", 0)[0]), osType=1\r\n| sort by ClassificationWeight desc, computersCount desc, displayName asc\r\n| extend informationLink=(iff(isnotempty(InformationId) and isnotempty(InformationUrl), toobject(strcat('{ \"uri\": \"', InformationUrl, '\", \"text\": \"', InformationId, '\", \"target\": \"blank\" }')), toobject('')))\r\n| project-away ClassificationWeight, InformationId, InformationUrl",
+              "size": 0,
+              "noDataMessage": "Select a VM above",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Computer",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "id",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "classification",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Security",
+                          "representation": "redBright",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Critical",
+                          "representation": "redBright",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "osType",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "computersCount",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "informationLink",
+                    "formatter": 5
+                  }
+                ],
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "Computer"
+                  ]
+                },
+                "labelSettings": [
+                  {
+                    "columnId": "Computer",
+                    "label": "VM"
+                  },
+                  {
+                    "columnId": "id"
+                  },
+                  {
+                    "columnId": "displayName",
+                    "label": "Product Name"
+                  },
+                  {
+                    "columnId": "productArch",
+                    "label": "Product Architecture"
+                  },
+                  {
+                    "columnId": "classification",
+                    "label": "Patch Classification"
+                  },
+                  {
+                    "columnId": "osType"
+                  },
+                  {
+                    "columnId": "computersCount"
+                  },
+                  {
+                    "columnId": "informationLink"
+                  }
+                ]
+              }
+            },
+            "conditionalVisibilities": [
+              {
+                "parameterName": "selectedTab",
+                "comparison": "isEqualTo",
+                "value": "PatchStatus"
+              },
+              {
+                "parameterName": "selectedPatchTab",
+                "comparison": "isEqualTo",
+                "value": "LinuxPatch"
+              }
+            ],
+            "name": "query - 4"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "selectedPatchTab",
+              "comparison": "isEqualTo",
+              "value": "WindowsPatch"
+            },
+            "name": "query - 5"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| project Computer, Title, Classification, PublishedDate, UpdateState, Product\r\n| summarize count(Classification) by Computer \r\n| top 5 by count_Classification desc ",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart"
+            },
+            "customWidth": "50",
+            "conditionalVisibility": {
+              "parameterName": "selectedPatchTab",
+              "comparison": "isEqualTo",
+              "value": "WindowsPatch"
+            },
+            "name": "query - 6"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions, Computer, ResourceId, ComputerEnvironment, VMUUID) by SourceComputerId\r\n| where Solutions has \"updates\"\r\n| extend vmuuId=VMUUID, azureResourceId=ResourceId, osType=2, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2)\r\n| join kind=leftouter\r\n(\r\n    Update\r\n    | where TimeGenerated>ago(14h) and OSType!=\"Linux\" and SourceComputerId in ((Heartbeat\r\n    | where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n    | summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n    | where Solutions has \"updates\"\r\n    | distinct SourceComputerId))\r\n    | summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification, Title, Optional, Approved, Computer, ComputerEnvironment) by Computer, SourceComputerId, UpdateID\r\n    | summarize Computer=any(Computer), ComputerEnvironment=any(ComputerEnvironment), missingCriticalUpdatesCount=countif(Classification has \"Critical\" and UpdateState=~\"Needed\" and Approved!=false), missingSecurityUpdatesCount=countif(Classification has \"Security\" and UpdateState=~\"Needed\" and Approved!=false), missingOtherUpdatesCount=countif(Classification !has \"Critical\" and Classification !has \"Security\" and UpdateState=~\"Needed\" and Optional==false and Approved!=false), lastAssessedTime=max(TimeGenerated), lastUpdateAgentSeenTime=\"\" by SourceComputerId\r\n    | extend compliance=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0, 2, 1)\r\n    | extend ComplianceOrder=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0 or missingOtherUpdatesCount > 0, 1, 3)\r\n)\r\non SourceComputerId\r\n| project id=SourceComputerId, displayName=Computer, sourceComputerId=SourceComputerId, scopedToUpdatesSolution=true, missingCriticalUpdatesCount=coalesce(missingCriticalUpdatesCount, -1), missingSecurityUpdatesCount=coalesce(missingSecurityUpdatesCount, -1), missingOtherUpdatesCount=coalesce(missingOtherUpdatesCount, -1), compliance=coalesce(compliance, 4), lastAssessedTime, lastUpdateAgentSeenTime, osType=2, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), ComplianceOrder=coalesce(ComplianceOrder, 2) \r\n| order by ComplianceOrder asc, missingCriticalUpdatesCount desc, missingSecurityUpdatesCount desc, missingOtherUpdatesCount desc, displayName asc\r\n| project displayName, CriticalUpdates=missingCriticalUpdatesCount, SecurityUpdates=missingSecurityUpdatesCount, OtherUpdates=missingOtherUpdatesCount,  Environment=environment, lastAssessedTime\r\n//| extend osType = replace(@\"2\", @\"Windows\", tostring(osType))\r\n//| extend osType = replace(@\"1\", @\"Linux\", tostring(osType))\r\n| extend Environment = replace(@\"2\", @\"Non-Azure\", tostring(Environment))\r\n| extend Environment = replace(@\"1\", @\"Azure\", tostring(Environment))",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "exportFieldName": "displayName",
+              "exportParameterName": "SelectedWindowsComputer",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "CriticalUpdates",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "greenRed"
+                    }
+                  },
+                  {
+                    "columnMatch": "SecurityUpdates",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "greenRed"
+                    }
+                  },
+                  {
+                    "columnMatch": "OtherUpdates",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "greenBlue"
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "query - 7"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false and Computer=='{SelectedWindowsComputer}'\r\n| project Computer, Product, Title, Classification, PublishedDate",
+              "size": 0,
+              "noDataMessage": "Select a VM above",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Computer",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "Classification",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Security",
+                          "representation": "redBright",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Critical",
+                          "representation": "redBright",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "Computer"
+                  ],
+                  "expandTopLevel": true
+                },
+                "labelSettings": [
+                  {
+                    "columnId": "Computer"
+                  },
+                  {
+                    "columnId": "Product"
+                  },
+                  {
+                    "columnId": "Title",
+                    "label": "Patch Title"
+                  },
+                  {
+                    "columnId": "Classification"
+                  },
+                  {
+                    "columnId": "PublishedDate"
+                  }
+                ]
+              },
+              "sortBy": []
+            },
+            "conditionalVisibility": {
+              "parameterName": "selectedPatchTab",
+              "comparison": "isEqualTo",
+              "value": "WindowsPatch"
+            },
+            "name": "query - 8"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "PatchStatus"
+      },
+      "name": "StepName-PatchStatus"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
