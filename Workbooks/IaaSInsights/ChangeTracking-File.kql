@@ -1,0 +1,16 @@
+#File - summarize, render Pie 
+ConfigurationChange
+| where ConfigChangeType == "Files" and TimeGenerated > ago(100d)
+| extend Months = dynamic({"1":"Jan", "2":"Feb", "3":"Mar", "4":"Apr", "5":"May", "6":"Jun", "7":"Jul", "8":"Aug", "9":"Sep", "10":"Oct", "11":"Nov", "12":"Dec"})
+| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated))," ",  Months[tostring(getmonth(TimeGenerated))])
+| summarize count() by DateChanged, ChangeCategory
+
+#File - summary table of add/modified 
+ConfigurationChange
+| where ConfigChangeType == "Files" and TimeGenerated > ago(100d)
+| extend FileSizeKB = round(todecimal(todecimal(Size) / 1000), 1)
+| extend Months = dynamic({"1":"Jan", "2":"Feb", "3":"Mar", "4":"Apr", "5":"May", "6":"Jun", "7":"Jul", "8":"Aug", "9":"Sep", "10":"Oct", "11":"Nov", "12":"Dec"})
+| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),"-",  Months[tostring(getmonth(TimeGenerated))],"-" ,getyear(TimeGenerated))
+| summarize FilePath = any(FileSystemPath), ChangeCategory = any(ChangeCategory) by Computer, DateChanged, FileSizeKB
+| project DateChanged, Computer, ChangeCategory, FilePath, FileSizeKB
+

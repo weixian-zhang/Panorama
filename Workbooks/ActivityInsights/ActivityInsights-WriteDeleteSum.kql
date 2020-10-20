@@ -1,0 +1,14 @@
+AzureActivity
+| extend ResourceCategory = parse_json(Properties).resourceProviderValue
+| extend ActioNamespace = split(parse_json(Authorization).action, "/")
+| extend ActionType = toupper(ActioNamespace[array_length(ActioNamespace) -1])
+| extend WriteAction = iif(toupper(ActioNamespace[array_length(ActioNamespace) -1]) == "WRITE", "WRITE", "")
+| extend DeleteAction = iif(toupper(ActioNamespace[array_length(ActioNamespace) -1]) == "DELETE", "DELETE", "")
+| where OperationNameValue !in (
+    "MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE",
+    "MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE",
+    "MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE") and
+  ActionType in ("WRITE", "DELETE") and
+  CategoryValue  == "Administrative" and ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
+  ActivityStatusValue == "Success" and TimeGenerated {TimeRange}
+| summarize count() by ActionType

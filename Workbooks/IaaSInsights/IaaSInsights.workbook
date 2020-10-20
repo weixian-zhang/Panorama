@@ -5,9 +5,6 @@
       "type": 9,
       "content": {
         "version": "KqlParameterItem/1.0",
-        "crossComponentResources": [
-          "{Subscription}"
-        ],
         "parameters": [
           {
             "id": "6a1ae947-c340-460f-94e5-cba8f0763c85",
@@ -48,7 +45,7 @@
               "{Subscription}"
             ],
             "value": [
-              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352/resourceGroups/CH-OpsRG-Pri/providers/Microsoft.OperationalInsights/workspaces/CH-LA"
+              "value::all"
             ],
             "typeSettings": {
               "additionalResourceOptions": [
@@ -99,7 +96,7 @@
             "type": 4,
             "isRequired": true,
             "value": {
-              "durationMs": 604800000
+              "durationMs": 172800000
             },
             "typeSettings": {
               "selectableValues": [
@@ -169,7 +166,7 @@
           }
         ],
         "style": "pills",
-        "queryType": 1,
+        "queryType": 0,
         "resourceType": "microsoft.resourcegraph/resources"
       },
       "name": "parameters - 0"
@@ -184,7 +181,7 @@
             "id": "102a8a0b-1cfb-4375-a088-a9ad87b9812f",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
-            "linkLabel": "Availability",
+            "linkLabel": "VM Availability",
             "subTarget": "Availability",
             "style": "link"
           },
@@ -213,14 +210,6 @@
             "style": "link"
           },
           {
-            "id": "a1276654-573c-4290-ad46-014be6c34fda",
-            "cellValue": "selectedTab",
-            "linkTarget": "parameter",
-            "linkLabel": "Backup Status",
-            "subTarget": "BackupStatus",
-            "style": "link"
-          },
-          {
             "id": "237bb0b7-1715-4094-b5b0-7c0ed405576d",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
@@ -233,12 +222,23 @@
       "name": "links - 2"
     },
     {
+      "type": 1,
+      "content": {
+        "json": "### VM Availability for {TimeRange}"
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "Availability"
+      },
+      "name": "text - 7"
+    },
+    {
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
         "query": "{\"version\":\"AzureHealthQuery/1.0\",\"queryType\":\"Detailed\"}",
         "size": 0,
-        "title": "VM Availability",
         "queryType": 4,
         "resourceType": "microsoft.compute/virtualmachines",
         "crossComponentResources": [
@@ -295,14 +295,25 @@
       "name": "StepName-Availability"
     },
     {
+      "type": 1,
+      "content": {
+        "json": "### CPU & Memory Health for {TimeRange}"
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "CPUMemory"
+      },
+      "name": "text - 7 - Copy"
+    },
+    {
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
         "query": "InsightsMetrics\r\n| where Namespace == \"Memory\" and Name == \"AvailableMB\" and TimeGenerated {TimeRange:value}\r\n| extend SplitRscId = split(_ResourceId, \"/\")\r\n| extend ResourceGroup = SplitRscId[4]\r\n| extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])\r\n| extend DomainName = Computer\r\n| extend AvailableGB = round(Val/1000,1)\r\n| extend TotalMemoryGB = round(todecimal(tostring(parse_json(Tags)[\"vm.azm.ms/memorySizeMB\"])) / 1000,1)\r\n| where VMName in (split(tolower(\"{VirtualMachines:name}\"), \", \"))\r\n| summarize AvailableGB=min(AvailableGB) by tostring(ResourceGroup), VMName, DomainName, TotalMemoryGB, CompositeMemDiff=TotalMemoryGB\r\n| join kind=inner \r\n  ( InsightsMetrics\r\n    | where Namespace == \"Processor\" and Name == \"UtilizationPercentage\"\r\n    and TimeGenerated {TimeRange:value}\r\n    | extend SplitRscId = split(_ResourceId, \"/\")\r\n    | extend DomainName = Computer\r\n    | extend Cores = tostring(parse_json(Tags)[\"vm.azm.ms/totalCpus\"])\r\n    | extend CPUPercent = round(Val,1)\r\n    | extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])\r\n    | summarize CPUPercent=min(CPUPercent) by VMName, DomainName, Cores\r\n  )\r\n  on VMName\r\n| project ResourceGroup, VMName, DomainName, Cores, CPUPercent, AvailableGB, TotalMemoryGB, CompositeMemDiff=TotalMemoryGB",
         "size": 0,
-        "title": "CPU & Memory",
         "timeContext": {
-          "durationMs": 604800000
+          "durationMs": 0
         },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
@@ -437,12 +448,23 @@
       "name": "StepName-CPUMemory"
     },
     {
+      "type": 1,
+      "content": {
+        "json": "### Disk Capacity for {TimeRange}"
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "DiskCapacity"
+      },
+      "name": "text - 7 - Copy - Copy"
+    },
+    {
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
         "query": "Perf\r\n| where ObjectName == \"LogicalDisk\" \r\n| where CounterName == \"Free Megabytes\" and \r\n  InstanceName !in (\"_Total\") and InstanceName !contains \"HarddiskVolume\" and TimeGenerated {TimeRange:value}\r\n| extend SplitRscId = split(_ResourceId, \"/\")\r\n| where SplitRscId[(array_length(SplitRscId) - 4)] != \"virtualmachinescalesets\"\r\n| extend DomainName = Computer\r\n| extend FreeSpaceGB = round((CounterValue / 1000),1)\r\n| extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])\r\n| where VMName in (split(tolower(\"{VirtualMachines:name}\"), \", \"))\r\n| summarize round(min(FreeSpaceGB), 1) by VMName, DomainName, InstanceName //, SVMs\r\n| join kind=inner \r\n  (Perf\r\n        | where ObjectName == \"LogicalDisk\" and\r\n          CounterName == \"% Free Space\" and\r\n          TimeGenerated {TimeRange:value}\r\n        | extend DomainName = Computer\r\n        | extend FreePercent = round(CounterValue,1)\r\n        | extend UsedPercent = round((100 - FreePercent),1)\r\n        | extend Total = FreePercent + UsedPercent\r\n        | summarize min(FreePercent), min(UsedPercent) by DomainName, Total\r\n   ) on DomainName",
         "size": 0,
-        "title": "Disk Capacity",
         "timeContext": {
           "durationMs": 0
         },
@@ -611,6 +633,18 @@
       }
     },
     {
+      "type": 1,
+      "content": {
+        "json": "### Linux & Windows Patch Status for {TimeRange}"
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "PatchStatus"
+      },
+      "name": "text - 7 - Copy - Copy - Copy"
+    },
+    {
       "type": 12,
       "content": {
         "version": "NotebookGroup/1.0",
@@ -650,7 +684,7 @@
               "size": 0,
               "title": "Patch Required By VM",
               "timeContext": {
-                "durationMs": 0
+                "durationMs": 86400000
               },
               "timeContextFromParameter": "TimeRange",
               "queryType": 0,
@@ -683,7 +717,7 @@
               "size": 0,
               "title": "Patch By Classification",
               "timeContext": {
-                "durationMs": 604800000
+                "durationMs": 86400000
               },
               "timeContextFromParameter": "TimeRange",
               "queryType": 0,
@@ -723,7 +757,7 @@
               "query": "Heartbeat\r\n| where TimeGenerated {TimeRange} and OSType==\"Linux\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions, Computer, ResourceId, ComputerEnvironment, VMUUID) by SourceComputerId\r\n| where Solutions has \"updates\"\r\n| extend vmuuId=VMUUID, azureResourceId=ResourceId, osType=1, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), scopedToUpdatesSolution=true, lastUpdateAgentSeenTime=\"\"\r\n| join kind=leftouter\r\n(\r\n    Update\r\n    | where TimeGenerated {TimeRange} and OSType==\"Linux\" and SourceComputerId in ((Heartbeat\r\n    | where TimeGenerated  {TimeRange} and OSType==\"Linux\" and notempty(Computer)\r\n    | summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n    | where Solutions has \"updates\"\r\n    | distinct SourceComputerId))\r\n    | summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification, Product, Computer, ComputerEnvironment) by SourceComputerId, Product, ProductArch\r\n    | summarize Computer=any(Computer), ComputerEnvironment=any(ComputerEnvironment), missingCriticalUpdatesCount=countif(Classification has \"Critical\" and UpdateState=~\"Needed\"), missingSecurityUpdatesCount=countif(Classification has \"Security\" and UpdateState=~\"Needed\"), missingOtherUpdatesCount=countif(Classification !has \"Critical\" and Classification !has \"Security\" and UpdateState=~\"Needed\"), lastAssessedTime=max(TimeGenerated), lastUpdateAgentSeenTime=\"\" by SourceComputerId\r\n    | extend compliance=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0, 2, 1)\r\n    | extend ComplianceOrder=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0 or missingOtherUpdatesCount > 0, 1, 3)\r\n)\r\non SourceComputerId\r\n| project displayName=Computer, CriticalUpdates=coalesce(missingCriticalUpdatesCount, 0), SecurityUpdates=coalesce(missingSecurityUpdatesCount, 0), OtherUpdates=coalesce(missingOtherUpdatesCount, 0),\r\n environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), lastAssessedTime, lastUpdateAgentSeenTime\r\n//| extend osType = replace(@\"1\", @\"Linux\", tostring(osType))\r\n| extend environment = replace(@\"2\", @\"Non-Azure\", tostring(environment))\r\n| extend environment = replace(@\"1\", @\"Azure\", tostring(environment))",
               "size": 0,
               "timeContext": {
-                "durationMs": 0
+                "durationMs": 86400000
               },
               "timeContextFromParameter": "TimeRange",
               "exportFieldName": "displayName",
@@ -799,7 +833,7 @@
               "size": 0,
               "noDataMessage": "Select a VM above",
               "timeContext": {
-                "durationMs": 0
+                "durationMs": 86400000
               },
               "timeContextFromParameter": "TimeRange",
               "queryType": 0,
@@ -860,7 +894,8 @@
                   "treeType": 1,
                   "groupBy": [
                     "Computer"
-                  ]
+                  ],
+                  "expandTopLevel": true
                 },
                 "labelSettings": [
                   {
@@ -915,7 +950,7 @@
               "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
               "size": 0,
               "timeContext": {
-                "durationMs": 0
+                "durationMs": 86400000
               },
               "timeContextFromParameter": "TimeRange",
               "queryType": 0,
@@ -940,7 +975,7 @@
               "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| project Computer, Title, Classification, PublishedDate, UpdateState, Product\r\n| summarize count(Classification) by Computer \r\n| top 5 by count_Classification desc ",
               "size": 0,
               "timeContext": {
-                "durationMs": 0
+                "durationMs": 86400000
               },
               "timeContextFromParameter": "TimeRange",
               "queryType": 0,
@@ -965,7 +1000,7 @@
               "query": "Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions, Computer, ResourceId, ComputerEnvironment, VMUUID) by SourceComputerId\r\n| where Solutions has \"updates\"\r\n| extend vmuuId=VMUUID, azureResourceId=ResourceId, osType=2, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2)\r\n| join kind=leftouter\r\n(\r\n    Update\r\n    | where TimeGenerated>ago(14h) and OSType!=\"Linux\" and SourceComputerId in ((Heartbeat\r\n    | where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n    | summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n    | where Solutions has \"updates\"\r\n    | distinct SourceComputerId))\r\n    | summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification, Title, Optional, Approved, Computer, ComputerEnvironment) by Computer, SourceComputerId, UpdateID\r\n    | summarize Computer=any(Computer), ComputerEnvironment=any(ComputerEnvironment), missingCriticalUpdatesCount=countif(Classification has \"Critical\" and UpdateState=~\"Needed\" and Approved!=false), missingSecurityUpdatesCount=countif(Classification has \"Security\" and UpdateState=~\"Needed\" and Approved!=false), missingOtherUpdatesCount=countif(Classification !has \"Critical\" and Classification !has \"Security\" and UpdateState=~\"Needed\" and Optional==false and Approved!=false), lastAssessedTime=max(TimeGenerated), lastUpdateAgentSeenTime=\"\" by SourceComputerId\r\n    | extend compliance=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0, 2, 1)\r\n    | extend ComplianceOrder=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0 or missingOtherUpdatesCount > 0, 1, 3)\r\n)\r\non SourceComputerId\r\n| project id=SourceComputerId, displayName=Computer, sourceComputerId=SourceComputerId, scopedToUpdatesSolution=true, missingCriticalUpdatesCount=coalesce(missingCriticalUpdatesCount, -1), missingSecurityUpdatesCount=coalesce(missingSecurityUpdatesCount, -1), missingOtherUpdatesCount=coalesce(missingOtherUpdatesCount, -1), compliance=coalesce(compliance, 4), lastAssessedTime, lastUpdateAgentSeenTime, osType=2, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), ComplianceOrder=coalesce(ComplianceOrder, 2) \r\n| order by ComplianceOrder asc, missingCriticalUpdatesCount desc, missingSecurityUpdatesCount desc, missingOtherUpdatesCount desc, displayName asc\r\n| project displayName, CriticalUpdates=missingCriticalUpdatesCount, SecurityUpdates=missingSecurityUpdatesCount, OtherUpdates=missingOtherUpdatesCount,  Environment=environment, lastAssessedTime\r\n//| extend osType = replace(@\"2\", @\"Windows\", tostring(osType))\r\n//| extend osType = replace(@\"1\", @\"Linux\", tostring(osType))\r\n| extend Environment = replace(@\"2\", @\"Non-Azure\", tostring(Environment))\r\n| extend Environment = replace(@\"1\", @\"Azure\", tostring(Environment))",
               "size": 0,
               "timeContext": {
-                "durationMs": 0
+                "durationMs": 86400000
               },
               "timeContextFromParameter": "TimeRange",
               "exportFieldName": "displayName",
@@ -1005,6 +1040,11 @@
                 ]
               }
             },
+            "conditionalVisibility": {
+              "parameterName": "selectedPatchTab",
+              "comparison": "isEqualTo",
+              "value": "WindowsPatch"
+            },
             "name": "query - 7"
           },
           {
@@ -1015,7 +1055,7 @@
               "size": 0,
               "noDataMessage": "Select a VM above",
               "timeContext": {
-                "durationMs": 0
+                "durationMs": 86400000
               },
               "timeContextFromParameter": "TimeRange",
               "queryType": 0,
@@ -1100,6 +1140,491 @@
         "value": "PatchStatus"
       },
       "name": "StepName-PatchStatus"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "### File changes for {TimeRange}"
+            },
+            "name": "text - 10"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"Files\" and TimeGenerated {TimeRange}\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\" \",  Months[tostring(getmonth(TimeGenerated))])\r\n| summarize count() by DateChanged, ChangeCategory",
+              "size": 1,
+              "noDataMessage": "No changes",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "count_",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "count_",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "customWidth": "50",
+            "name": "query - 0",
+            "styleSettings": {
+              "padding": "0px",
+              "maxWidth": "100%"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"Files\" and TimeGenerated {TimeRange}\r\n| extend FileSizeKB = round(todecimal(todecimal(Size) / 1000), 1)\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\"-\",  Months[tostring(getmonth(TimeGenerated))],\"-\" ,getyear(TimeGenerated))\r\n| summarize FilePath = any(FileSystemPath), ChangeCategory = any(ChangeCategory) by Computer, DateChanged, FileSizeKB\r\n| order by todatetime(DateChanged) desc\r\n| project DateChanged, Computer, ChangeCategory, FilePath, FileSizeKB",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "sortBy": [
+                  {
+                    "itemKey": "DateChanged",
+                    "sortOrder": 2
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "DateChanged",
+                  "sortOrder": 2
+                }
+              ]
+            },
+            "customWidth": "50",
+            "name": "query - 5"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Windows Service changes for {TimeRange}"
+            },
+            "name": "text - 10 - Copy"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"WindowsServices\" and TimeGenerated {TimeRange}\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\" \",  Months[tostring(getmonth(TimeGenerated))])\r\n| summarize count() by DateChanged, ChangeCategory",
+              "size": 1,
+              "noDataMessage": "No Changes",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "count_",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "count_",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "customWidth": "50",
+            "showPin": false,
+            "name": "query - 0 - Copy",
+            "styleSettings": {
+              "padding": "0px",
+              "maxWidth": "100%"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"WindowsServices\" and TimeGenerated > ago(100d)\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\"-\",  Months[tostring(getmonth(TimeGenerated))],\"-\" ,getyear(TimeGenerated))\r\n| summarize ChangeCategory = any(ChangeCategory) by Computer, DateChanged, SvcDisplayName, SvcPath, SvcStartupType, SvcState\r\n| order by todatetime(DateChanged) desc\r\n| project DateChanged, Computer, SvcDisplayName, SvcPath, SvcStartupType, SvcState",
+              "size": 0,
+              "noDataMessage": "No changes",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "table"
+            },
+            "customWidth": "50",
+            "name": "query - 6"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Linux Daemon changes for {TimeRange}"
+            },
+            "name": "text - 10 - Copy - Copy"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"Daemons\" and TimeGenerated {TimeRange}\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\" \",  Months[tostring(getmonth(TimeGenerated))])\r\n| summarize count() by DateChanged, ChangeCategory",
+              "size": 1,
+              "noDataMessage": "No Changes",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "count_",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "count_",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "customWidth": "50",
+            "name": "query - 0 - Copy",
+            "styleSettings": {
+              "padding": "0px"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"Daemons\" and TimeGenerated {TimeRange}\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\"-\",  Months[tostring(getmonth(TimeGenerated))],\"-\" ,getyear(TimeGenerated))\r\n| summarize ChangeCategory = any(ChangeCategory) by Computer, DateChanged, SvcDisplayName, SvcPath, SvcStartupType, SvcState\r\n| order by todatetime(DateChanged) desc\r\n| project DateChanged, Computer, SvcDisplayName, SvcPath, SvcStartupType, SvcState",
+              "size": 0,
+              "noDataMessage": "No changes",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "table"
+            },
+            "customWidth": "50",
+            "name": "query - 7"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Software changes for {TimeRange} (exclude Patches) "
+            },
+            "name": "text - 10 - Copy - Copy - Copy"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"Software\" and SoftwareType == \"Application\" and TimeGenerated {TimeRange}\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\" \",  Months[tostring(getmonth(TimeGenerated))])\r\n| summarize count() by DateChanged, ChangeCategory",
+              "size": 1,
+              "noDataMessage": "No Changes",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "count_",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "count_",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "customWidth": "50",
+            "name": "query - 0 - Copy - Copy - Copy",
+            "styleSettings": {
+              "padding": "0px"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"Software\" and SoftwareType == \"Application\" and TimeGenerated {TimeRange}\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\"-\",  Months[tostring(getmonth(TimeGenerated))],\"-\" ,getyear(TimeGenerated))\r\n| summarize ChangeCategory = any(ChangeCategory) by Computer, DateChanged, Publisher, SoftwareName\r\n| order by todatetime(DateChanged) desc\r\n| project DateChanged, Computer, Publisher, SoftwareName, ChangeCategory",
+              "size": 0,
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "table"
+            },
+            "customWidth": "50",
+            "name": "query - 8"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Registry changes for {TimeRange}"
+            },
+            "name": "text - 10 - Copy - Copy - Copy - Copy"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "\r\nConfigurationChange\r\n| where ConfigChangeType == \"Registry\" and TimeGenerated {TimeRange}\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\" \",  Months[tostring(getmonth(TimeGenerated))])\r\n| summarize count() by DateChanged, ChangeCategory",
+              "size": 1,
+              "noDataMessage": "No Changes",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "piechart",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "count_",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  },
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              },
+              "graphSettings": {
+                "type": 0,
+                "topContent": {
+                  "columnMatch": "ChangeCategory",
+                  "formatter": 1
+                },
+                "centerContent": {
+                  "columnMatch": "count_",
+                  "formatter": 1,
+                  "numberFormat": {
+                    "unit": 17,
+                    "options": {
+                      "maximumSignificantDigits": 3,
+                      "maximumFractionDigits": 2
+                    }
+                  }
+                }
+              }
+            },
+            "customWidth": "50",
+            "name": "query - 0 - Copy - Copy - Copy - Copy",
+            "styleSettings": {
+              "padding": "0px"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ConfigurationChange\r\n| where ConfigChangeType == \"Registry\" and TimeGenerated {TimeRange}\r\n| extend Months = dynamic({\"1\":\"Jan\", \"2\":\"Feb\", \"3\":\"Mar\", \"4\":\"Apr\", \"5\":\"May\", \"6\":\"Jun\", \"7\":\"Jul\", \"8\":\"Aug\", \"9\":\"Sep\", \"10\":\"Oct\", \"11\":\"Nov\", \"12\":\"Dec\"})\r\n| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),\"-\",  Months[tostring(getmonth(TimeGenerated))],\"-\" ,getyear(TimeGenerated))\r\n| summarize ChangeCategory = any(ChangeCategory), Hive = any(Hive) by Computer, DateChanged, RegistryKey, ValueName, ValueData\r\n| order by todatetime(DateChanged) desc\r\n| project DateChanged, Computer, Hive, RegistryKey, ValueName, ValueData, ChangeCategory",
+              "size": 0,
+              "noDataMessage": "No changes",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "crossComponentResources": [
+                "{Workspaces}"
+              ],
+              "visualization": "table"
+            },
+            "customWidth": "50",
+            "name": "query - 9"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "ChangeTrack"
+      },
+      "name": "group - 6"
     }
   ],
   "fallbackResourceIds": [

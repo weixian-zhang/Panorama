@@ -1,0 +1,23 @@
+AzureActivity
+| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType
+| extend SignInAcctType = iif(PrincipalType == "", "User", PrincipalType)
+| extend RBACRole = parse_json(parse_json(Authorization).evidence).role
+| extend SigninUPN = parse_json(Claims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"]
+| extend SigninName = parse_json(Claims)["name"]
+| extend CallerIP = CallerIpAddress
+| extend ResourceCategory = parse_json(Properties).resourceProviderValue
+| extend ResourceIDSplit = split(_ResourceId, "/")
+| extend Resource = strcat(toupper(ResourceIDSplit[array_length(ResourceIDSplit)-2]), "/",
+         toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1]))
+| extend ActionNamespace = split(parse_json(Authorization).action, "/")
+| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])
+| where
+    ActionType in ("WRITE", "DELETE") and
+    OperationNameValue !in (
+    "MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE",
+    "MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE",
+    "MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE") and
+    CategoryValue  == "Administrative" and ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
+    ActivityStatusValue == "Success" and TimeGenerated {TimeRange}
+| project TimeGenerated, SubscriptionId, ResourceGroup, ResourceCategory,
+          Resource, ActionType, SignInAcctType, RBACRole, SigninUPN, SigninName

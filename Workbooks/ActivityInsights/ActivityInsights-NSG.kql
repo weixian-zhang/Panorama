@@ -1,0 +1,46 @@
+
+AzureActivity
+| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType
+| extend SignInAcctType = iif(PrincipalType == "", "User", PrincipalType)
+| extend RBACRole = parse_json(parse_json(Authorization).evidence).role
+| extend SigninUPN = parse_json(Claims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"]
+| extend SigninName = parse_json(Claims)["name"]
+| extend CallerIP = CallerIpAddress
+| extend ResourceCategory = parse_json(Properties).resourceProviderValue
+| extend ResourceIDSplit = split(_ResourceId, "/")
+| extend Resource = toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1])
+| extend ActionNamespace = split(parse_json(Authorization).action, "/")
+| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])
+| where
+    CategoryValue  == "Administrative" and
+    ActivityStatusValue in ("Started", "Success") and
+    isempty(OperationName) == false and
+    //PrincipalType != "ServicePrincipal" and 
+    ActionType in ("ACTION", "WRITE", "DELETE") and
+    toupper(OperationNameValue) startswith toupper("Microsoft.Network/networkSecurityGroups") and
+    // OperationNameValue !in (
+    // "MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE",
+    // "MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE",
+    // "MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE") and
+    ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
+    TimeGenerated > ago(200d)
+| join kind=inner
+  ( AzureActivity
+    | extend RequestBody = parse_json(tostring(parse_json(Properties)["requestbody"]))["properties"]
+    | extend SecurityRulesJArray = parse_json(tostring(parse_json(tostring(parse_json(Properties)["requestbody"]))["properties"]))["securityRules"]
+    | where isempty(SecurityRulesJArray) == false and array_length(SecurityRulesJArray) > 0
+  ) on CorrelationId
+| mv-expand SecurityRulesJArray
+| distinct TimeGenerated,
+           SubscriptionId,
+           ResourceGroup,
+           ActionType,
+           OperationName,
+           Resource,
+           tostring(RequestBody),
+           tostring(SecurityRulesJArray.name),
+           tostring(SecurityRulesJArray),  SignInAcctType, tostring(RBACRole), tostring(SigninUPN), tostring(SigninName)
+
+// | project Resource, ActivityStatusValue, RequestBody, SecurityRules
+
+// | project TimeGenerated, SubscriptionId, ResourceGroup, ActionType, Resource, ActivityStatusValue, RequestBody, SecurityRules,  SignInAcctType, RBACRole, SigninUPN, SigninName

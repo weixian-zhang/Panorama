@@ -1,0 +1,15 @@
+#Software - Pie chart summary
+ConfigurationChange
+| where ConfigChangeType == "Software" and SoftwareType == "Application" and TimeGenerated {TimeRange}
+| extend Months = dynamic({"1":"Jan", "2":"Feb", "3":"Mar", "4":"Apr", "5":"May", "6":"Jun", "7":"Jul", "8":"Aug", "9":"Sep", "10":"Oct", "11":"Nov", "12":"Dec"})
+| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated))," ",  Months[tostring(getmonth(TimeGenerated))])
+| summarize count() by DateChanged, ChangeCategory
+
+#software - summary table of add/modified 
+ConfigurationChange
+| where ConfigChangeType == "Software" and SoftwareType == "Application" and TimeGenerated > ago(100d)
+| extend Months = dynamic({"1":"Jan", "2":"Feb", "3":"Mar", "4":"Apr", "5":"May", "6":"Jun", "7":"Jul", "8":"Aug", "9":"Sep", "10":"Oct", "11":"Nov", "12":"Dec"})
+| extend DateChanged = strcat(tostring(dayofmonth(TimeGenerated)),"-",  Months[tostring(getmonth(TimeGenerated))],"-" ,getyear(TimeGenerated))
+| summarize ChangeCategory = any(ChangeCategory) by Computer, DateChanged, Publisher, SoftwareName
+| order by todatetime(DateChanged) desc
+| project DateChanged, Computer, Publisher, SoftwareName, ChangeCategory
