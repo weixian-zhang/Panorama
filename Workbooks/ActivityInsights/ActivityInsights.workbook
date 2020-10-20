@@ -1,0 +1,333 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "17eecd5d-e68a-4ee6-a557-7ac12a57e4a7",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "value": [
+              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352",
+              "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "includeAll": true,
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1"
+          },
+          {
+            "id": "2425679f-dc88-4de7-8afa-0df027057775",
+            "version": "KqlParameterItem/1.0",
+            "name": "Workspace",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "",
+            "delimiter": ",",
+            "query": "where type =~ 'microsoft.operationalinsights/workspaces'\r\n| order by name asc\r\n| project value = id, label = id",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1",
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "2b92507d-be7e-4372-bbba-e942b579bfd8",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time Range",
+            "type": 4,
+            "isRequired": true,
+            "value": {
+              "durationMs": 2419200000
+            },
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ],
+              "allowCustom": true
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 1"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "### Writes & Deletes for {TimeRange}  \r\n#### from: {Subscription:label}"
+      },
+      "name": "text - 3"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureActivity\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ActioNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActioNamespace[array_length(ActioNamespace) -1])\r\n| extend WriteAction = iif(toupper(ActioNamespace[array_length(ActioNamespace) -1]) == \"WRITE\", \"WRITE\", \"\")\r\n| extend DeleteAction = iif(toupper(ActioNamespace[array_length(ActioNamespace) -1]) == \"DELETE\", \"DELETE\", \"\")\r\n| where OperationNameValue !in (\r\n    \"MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE\") and\r\n  ActionType in (\"WRITE\", \"DELETE\") and\r\n  CategoryValue  == \"Administrative\" and ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n  ActivityStatusValue == \"Success\" and TimeGenerated {TimeRange}\r\n| summarize count() by ActionType",
+        "size": 1,
+        "noDataMessage": "No changes",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "piechart",
+        "chartSettings": {
+          "seriesLabelSettings": [
+            {
+              "seriesName": "Write",
+              "label": "Write"
+            }
+          ]
+        }
+      },
+      "customWidth": "100",
+      "name": "query - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureActivity\r\n| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n| extend RBACRole = parse_json(parse_json(Authorization).evidence).role\r\n| extend SigninUPN = parse_json(Claims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"]\r\n| extend SigninName = parse_json(Claims)[\"name\"]\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = strcat(toupper(ResourceIDSplit[array_length(ResourceIDSplit)-2]), \"/\",\r\n         toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1]))\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n| where\r\n    ActionType in (\"WRITE\", \"DELETE\") and\r\n    OperationNameValue !in (\r\n    \"MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE\") and\r\n    CategoryValue  == \"Administrative\" and ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    ActivityStatusValue == \"Success\" and TimeGenerated {TimeRange}\r\n| project TimeGenerated, SubscriptionId, ResourceGroup, ResourceCategory,\r\n          Resource, ActionType, SignInAcctType, RBACRole, SigninUPN, SigninName",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352/resourceGroups/CH-OpsRG-Pri/providers/Microsoft.OperationalInsights/workspaces/CH-LA"
+        ],
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "$gen_group",
+              "formatter": 13,
+              "formatOptions": {
+                "linkTarget": null,
+                "showIcon": true,
+                "customColumnWidthSetting": "27ch"
+              }
+            },
+            {
+              "columnMatch": "SubscriptionId",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "ResourceGroup",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "ActionType",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "==",
+                    "thresholdValue": "DELETE",
+                    "representation": "orange",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            }
+          ],
+          "hierarchySettings": {
+            "treeType": 1,
+            "groupBy": [
+              "SubscriptionId"
+            ],
+            "expandTopLevel": true
+          },
+          "sortBy": [
+            {
+              "itemKey": "$gen_thresholds_ActionType_6",
+              "sortOrder": 1
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "$gen_thresholds_ActionType_6",
+            "sortOrder": 1
+          }
+        ]
+      },
+      "name": "query - 0"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "### Network Security Group changes for {TimeRange}"
+      },
+      "name": "text - 4"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureActivity\r\n| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n| extend RBACRole = parse_json(parse_json(Authorization).evidence).role\r\n| extend SigninUPN = parse_json(Claims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"]\r\n| extend SigninName = parse_json(Claims)[\"name\"]\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1])\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n| where\r\n    ActionType in (\"ACTION\", \"WRITE\", \"DELETE\") and ActionNamespace has \"networkSecurityGroups\" and\r\n    OperationNameValue !in (\r\n    \"MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE\") and\r\n    CategoryValue  == \"Administrative\" and ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    ActivityStatusValue == \"Success\" and TimeGenerated {TimeRange}\r\n| project TimeGenerated, SubscriptionId, ResourceGroup, ActionType, Resource, SignInAcctType, RBACRole, SigninUPN, SigninName",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 2419200000
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "$gen_group",
+              "formatter": 13,
+              "formatOptions": {
+                "linkTarget": null,
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "SubscriptionId",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "ResourceGroup",
+              "formatter": 5
+            }
+          ],
+          "hierarchySettings": {
+            "treeType": 1,
+            "groupBy": [
+              "SubscriptionId",
+              "ResourceGroup"
+            ],
+            "expandTopLevel": true
+          }
+        }
+      },
+      "name": "query - 5"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "### Firewall changes for {TimeRange}"
+      },
+      "name": "text - 4 - Copy"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureActivity\r\n| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n| extend RBACRole = parse_json(parse_json(Authorization).evidence).role\r\n| extend SigninUPN = parse_json(Claims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"]\r\n| extend SigninName = parse_json(Claims)[\"name\"]\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = strcat(\r\n        toupper(ResourceIDSplit[array_length(ResourceIDSplit)-2]), \"/\",\r\n        toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1]), \"/\"\r\n    )\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n| where\r\n    PrincipalType != \"ServicePrincipal\" and \r\n    ActionType in (\"ACTION\", \"WRITE\", \"DELETE\") and toupper(OperationNameValue) startswith toupper(\"Microsoft.Network/azureFirewalls\") and\r\n    OperationNameValue !in (\r\n    \"MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE\") and\r\n    CategoryValue  == \"Administrative\" and ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    ActivityStatusValue == \"Success\" and TimeGenerated {TimeRange}\r\n    | project TimeGenerated, SubscriptionId, ResourceGroup, ActionType, Resource, SignInAcctType, RBACRole, SigninUPN, SigninName",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 2419200000
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table"
+      },
+      "name": "query - 7"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
