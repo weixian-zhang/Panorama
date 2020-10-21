@@ -1,0 +1,18 @@
+
+AzureActivity
+| extend ResourceCategory = parse_json(Properties).resourceProviderValue
+| extend ResourceIDSplit = split(_ResourceId, "/")
+| extend Resource = toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1])
+| extend ActionNamespace = split(parse_json(Authorization).action, "/")
+| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])
+| extend NSG = parse_json(tostring(parse_json(tostring(parse_json(Properties)["requestbody"]))["properties"]))
+| extend Rules = NSG["securityRules"]
+| where
+    CategoryValue  == "Administrative" and
+    ActivityStatusValue == "Success" and
+    isempty(OperationName) == false and
+    ActionType in ("WRITE", "DELETE") and
+    toupper(OperationNameValue) startswith toupper("Microsoft.Network/networkSecurityGroups") or OperationNameValue has "securityRules" and
+    ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
+    TimeGenerated {TimeRange}
+| summarize dcount(tostring(Rules)) by ResourceGroup

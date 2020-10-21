@@ -9,7 +9,6 @@ AzureActivity
  | mv-expand NatRulesCollection
  | extend CollectionName = NatRulesCollection["name"]
  | extend CollectionProps = NatRulesCollection["properties"]
- //| mv-expand CollectionProps
      | extend Action = CollectionProps["action"]["type"]
      | extend Priority = CollectionProps["priority"]
      | extend Rules = CollectionProps["rules"]
