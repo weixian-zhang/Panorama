@@ -1,0 +1,43 @@
+
+AzureActivity
+| extend LocalTime = datetime_add('hour',8, TimeGenerated)
+
+| extend ResourceCategory = parse_json(Properties).resourceProviderValue
+| extend RequestBody = parse_json(tostring(parse_json(Properties)["requestbody"]))["properties"]
+| extend NatRulesCollection = RequestBody["natRuleCollections"]
+
+ | mv-expand NatRulesCollection
+ | extend CollectionName = NatRulesCollection["name"]
+ | extend CollectionProps = NatRulesCollection["properties"]
+ //| mv-expand CollectionProps
+     | extend Action = CollectionProps["action"]["type"]
+     | extend Priority = CollectionProps["priority"]
+     | extend Rules = CollectionProps["rules"]
+        | mv-expand Rules
+        | extend RuleName = Rules["name"]
+        | extend Protocols = Rules["protocols"]
+        | extend SourceIpGroups = Rules["sourceIpGroups"]
+        | extend SourceAddresses = Rules["sourceAddresses"]
+        | extend DestinationAddresses = Rules["destinationAddresses"]
+        | extend DestinationPorts = Rules["destinationPorts"]
+        | extend TranslatedAddress = Rules["translatedAddress"]
+        | extend TranslatedPort = Rules["translatedPort"]
+//| extend NetRules = RequestBody["networkRuleCollections"]
+| where
+    CorrelationId == "{CorrelationId}" and 
+    _ResourceId == "{ResourceId}" and
+    CategoryValue  == "Administrative" and
+    ActivityStatusValue == "Started" //and //select only 1 entry of the same activity
+
+| project
+    CollectionName,
+    RuleName,
+    Action,
+    Priority,
+    Protocols,
+    SourceIpGroups,
+    SourceAddresses,
+    DestinationAddresses,
+    DestinationPorts,
+    TranslatedAddress,
+    TranslatedPort

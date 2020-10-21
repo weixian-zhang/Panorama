@@ -1,9 +1,10 @@
 AzureActivity
 | extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType
 | extend SignInAcctType = iif(PrincipalType == "", "User", PrincipalType)
+| extend AppId = parse_json(Claims)["appid"] //show appid/clientid of registered app if type = ServicePrincipal
 | extend RBACRole = parse_json(parse_json(Authorization).evidence).role
-| extend SigninUPN = parse_json(Claims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"]
-| extend SigninName = parse_json(Claims)["name"]
+| extend SigninUPN = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(Claims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"])
+                | extend SigninName = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(Claims)["name"])
 | extend CallerIP = CallerIpAddress
 | extend ResourceCategory = parse_json(Properties).resourceProviderValue
 | extend ResourceIDSplit = split(_ResourceId, "/")

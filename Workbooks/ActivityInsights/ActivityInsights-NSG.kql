@@ -2,11 +2,6 @@
 
 let NSGGroup =
 AzureActivity
-//| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType
-//| extend SignInAcctType = iif(PrincipalType == "", "User", PrincipalType)
-// | extend RBACRole = parse_json(parse_json(Authorization).evidence).role
-// | extend SigninUPN = parse_json(Claims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"]
-// | extend SigninName = parse_json(Claims)["name"]
 | extend CallerIP = CallerIpAddress
 | extend ResourceCategory = parse_json(Properties).resourceProviderValue
 | extend ResourceIDSplit = split(_ResourceId, "/")
@@ -33,10 +28,11 @@ AzureActivity
                 | extend JoinedAuthorization = Authorization
                 | extend JoinedClaims = Claims
                 | extend PrincipalType =  parse_json(parse_json(JoinedAuthorization).evidence).principalType
+                | extend AppId = parse_json(JoinedClaims)["appid"] //show appid/clientid of registered app if type = ServicePrincipal
                 | extend SignInAcctType = iif(PrincipalType == "", "User", PrincipalType)
                 | extend RBACRole = parse_json(parse_json(JoinedAuthorization).evidence).role
-                | extend SigninUPN = parse_json(JoinedClaims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"]
-                | extend SigninName = parse_json(JoinedClaims)["name"]
+                | extend SigninUPN = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(JoinedClaims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"])
+                | extend SigninName = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(JoinedClaims)["name"])
           ) on CorrelationId
 | mv-expand Rules
 | extend RuleName = tostring(Rules.name)
@@ -86,8 +82,6 @@ AzureActivity
 
 let NSGRulesNotGroup =
     AzureActivity
-        //| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType
-        //| extend SignInAcctType = iif(PrincipalType == "", "User", PrincipalType)
         | extend CallerIP = CallerIpAddress
         | extend ResourceCategory = parse_json(Properties).resourceProviderValue
         | extend ResourceIDSplit = split(_ResourceId, "/")
@@ -105,11 +99,7 @@ let NSGRulesNotGroup =
         | extend DestinationAddressPrefix = tostring(RequestBody.destinationAddressPrefix)
         | extend DestinationPortRange = tostring(RequestBody.destinationPortRange)
         | extend Description = tostring(RequestBody.description)
-        //| extend IsArray = iif(array_length(RequestBody) > 0, true, false)
-        //| extend NSG = parse_json(tostring(parse_json(tostring(parse_json(Properties)["requestbody"]))["properties"]))
-        //| extend Rules = NSG["securityRules"]
         | where
-            //isnotempty(Rules) and array_length(Rules) > 0 and
             CategoryValue  == "Administrative" and
             ActivityStatusValue in ("Started", "Success") and
             isempty(OperationName) == false and
@@ -123,21 +113,13 @@ let NSGRulesNotGroup =
                 | extend JoinedAuthorization = Authorization
                 | extend JoinedClaims = Claims
                 | extend PrincipalType =  parse_json(parse_json(JoinedAuthorization).evidence).principalType
+                | extend AppId = parse_json(JoinedClaims)["appid"] //show appid/clientid of registered app if type = ServicePrincipal
                 | extend SignInAcctType = iif(PrincipalType == "", "User", PrincipalType)
                 | extend RBACRole = parse_json(parse_json(JoinedAuthorization).evidence).role
-                | extend SigninUPN = parse_json(JoinedClaims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"]
-                | extend SigninName = parse_json(JoinedClaims)["name"]
+                | extend SigninUPN = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(JoinedClaims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"])
+                | extend SigninName = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(JoinedClaims)["name"])
           ) on CorrelationId
-        // | mv-expand Rules
-         
-        // | extend Direction = tostring(Rules.properties.direction)
-        // | extend Priority = tostring(Rules.properties.priority)
-        // | extend Protocol = tostring(Rules.properties.protocol)
-        // | extend SourceAddressPrefix = tostring(Rules.properties.sourceAddressPrefix)
-        // | extend SourcePortRange = tostring(Rules.properties.sourcePortRange)
-        // | extend DestinationAddressPrefix = tostring(Rules.properties.destinationAddressPrefix)
-        // | extend DestinationPortRange = tostring(Rules.properties.destinationPortRange)
-        // | extend Description = tostring(Rules.properties.description)
+
         | distinct TimeGenerated,
                 SubscriptionId,
                 ResourceGroup,
@@ -176,10 +158,21 @@ let NSGRulesNotGroup =
 
 NSGGroup
 | union NSGRulesNotGroup
-
-                
-
-
-// | project Resource, ActivityStatusValue, RequestBody, SecurityRules
-
-// | project TimeGenerated, SubscriptionId, ResourceGroup, ActionType, Resource, ActivityStatusValue, RequestBody, SecurityRules,  SignInAcctType, RBACRole, SigninUPN, SigninName
+| extend LocalTime = datetime_add('hour',8, TimeGenerated)
+| project TimeGenerated=format_datetime(LocalTime, 'dd/MM/yyyy [hh:mm:ss tt]'),
+            SubscriptionId,
+                ResourceGroup,
+                OperationName,
+                Resource,
+                SignInAcctType,
+                tostring(RBACRole),
+                tostring(SigninUPN),
+                tostring(SigninName),
+                RuleName,
+                Direction,
+                Priority,
+                Protocol,
+                SourceAddressPrefix, 
+                DestinationAddressPrefix,
+                DestinationPortRange,
+                Description

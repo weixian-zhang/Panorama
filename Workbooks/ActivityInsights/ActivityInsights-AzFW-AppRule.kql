@@ -1,0 +1,41 @@
+
+AzureActivity
+| extend LocalTime = datetime_add('hour',8, TimeGenerated)
+
+| extend ResourceCategory = parse_json(Properties).resourceProviderValue
+| extend RequestBody = parse_json(tostring(parse_json(Properties)["requestbody"]))["properties"]
+| extend AppRulesCollection = RequestBody["applicationRuleCollections"]
+
+| mv-expand AppRulesCollection
+| extend CollectionName = AppRulesCollection["name"]
+| extend CollectionProps = AppRulesCollection["properties"]
+    //| mv-expand CollectionProps
+    | extend Action = CollectionProps["action"]["type"]
+    | extend Rules = CollectionProps["rules"]
+        | mv-expand Rules
+        | extend RuleName = Rules["name"]
+        | extend priority = Rules["priority"]
+        | extend Direction = Rules["direction"]
+        | extend Protocols = Rules["protocols"]
+        | extend SourceIpGroups = Rules["sourceIpGroups"]
+        | extend SourceAddresses = Rules["sourceAddresses"]
+        | extend TargetFqdns = Rules["targetFqdns"]
+//| extend NatRules = RequestBody["natRuleCollections"]
+//| extend NetRules = RequestBody["networkRuleCollections"]
+| where
+
+    CorrelationId == "{CorrelationId}" and 
+    _ResourceId == "{ResourceId}" and
+    CategoryValue  == "Administrative" and
+    ActivityStatusValue == "Started" //and //select only 1 entry of the same activity
+
+| project
+    CollectionName,
+    Action,
+    RuleName,
+    priority,
+    Direction,
+    Protocols,
+    SourceIpGroups,
+    SourceAddresses,
+    TargetFqdns

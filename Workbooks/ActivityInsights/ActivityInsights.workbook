@@ -5,6 +5,9 @@
       "type": 9,
       "content": {
         "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
         "parameters": [
           {
             "id": "17eecd5d-e68a-4ee6-a557-7ac12a57e4a7",
@@ -16,7 +19,6 @@
             "quote": "'",
             "delimiter": ",",
             "value": [
-              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352",
               "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206"
             ],
             "typeSettings": {
@@ -70,7 +72,7 @@
             "type": 4,
             "isRequired": true,
             "value": {
-              "durationMs": 2419200000
+              "durationMs": 2592000000
             },
             "typeSettings": {
               "selectableValues": [
@@ -128,15 +130,15 @@
           }
         ],
         "style": "pills",
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces"
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
       },
       "name": "parameters - 1"
     },
     {
       "type": 1,
       "content": {
-        "json": "### Writes & Deletes for {TimeRange}  \r\n#### from: {Subscription:label}"
+        "json": "### Activities for {TimeRange}  \r\n#### subscriptions: {Subscription:label}"
       },
       "name": "text - 3"
     },
@@ -172,15 +174,17 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "AzureActivity\r\n| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n| extend RBACRole = parse_json(parse_json(Authorization).evidence).role\r\n| extend SigninUPN = parse_json(Claims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"]\r\n| extend SigninName = parse_json(Claims)[\"name\"]\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = strcat(toupper(ResourceIDSplit[array_length(ResourceIDSplit)-2]), \"/\",\r\n         toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1]))\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n| where\r\n    ActionType in (\"WRITE\", \"DELETE\") and\r\n    OperationNameValue !in (\r\n    \"MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE\") and\r\n    CategoryValue  == \"Administrative\" and ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    ActivityStatusValue == \"Success\" and TimeGenerated {TimeRange}\r\n| project TimeGenerated, SubscriptionId, ResourceGroup, ResourceCategory,\r\n          Resource, ActionType, SignInAcctType, RBACRole, SigninUPN, SigninName",
+        "query": "AzureActivity\r\n| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n| extend AppId = parse_json(Claims)[\"appid\"] //show appid/clientid of registered app if type = ServicePrincipal\r\n| extend RBACRole = parse_json(parse_json(Authorization).evidence).role\r\n| extend SigninUPN = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(Claims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"])\r\n                | extend SigninName = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(Claims)[\"name\"])\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = strcat(toupper(ResourceIDSplit[array_length(ResourceIDSplit)-2]), \"/\",\r\n         toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1]))\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n| where\r\n    ActionType in (\"WRITE\", \"DELETE\") and\r\n    OperationNameValue !in (\r\n    \"MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE\") and\r\n    CategoryValue  == \"Administrative\" and ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    ActivityStatusValue == \"Success\" and TimeGenerated {TimeRange}\r\n| project TimeGenerated, SubscriptionId, ResourceGroup, ResourceCategory,\r\n          Resource, ActionType, SignInAcctType, RBACRole, SigninUPN, SigninName",
         "size": 0,
+        "noDataMessage": "No changes",
         "timeContext": {
-          "durationMs": 86400000
+          "durationMs": 2592000000
         },
+        "timeContextFromParameter": "TimeRange",
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "crossComponentResources": [
-          "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352/resourceGroups/CH-OpsRG-Pri/providers/Microsoft.OperationalInsights/workspaces/CH-LA"
+          "{Workspace}"
         ],
         "gridSettings": {
           "formatters": [
@@ -256,10 +260,11 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "AzureActivity\r\n| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n| extend RBACRole = parse_json(parse_json(Authorization).evidence).role\r\n| extend SigninUPN = parse_json(Claims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"]\r\n| extend SigninName = parse_json(Claims)[\"name\"]\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1])\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n| where\r\n    ActionType in (\"ACTION\", \"WRITE\", \"DELETE\") and ActionNamespace has \"networkSecurityGroups\" and\r\n    OperationNameValue !in (\r\n    \"MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE\") and\r\n    CategoryValue  == \"Administrative\" and ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    ActivityStatusValue == \"Success\" and TimeGenerated {TimeRange}\r\n| project TimeGenerated, SubscriptionId, ResourceGroup, ActionType, Resource, SignInAcctType, RBACRole, SigninUPN, SigninName",
+        "query": "\r\n\r\nlet NSGGroup =\r\nAzureActivity\r\n//| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n//| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n// | extend RBACRole = parse_json(parse_json(Authorization).evidence).role\r\n// | extend SigninUPN = parse_json(Claims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"]\r\n// | extend SigninName = parse_json(Claims)[\"name\"]\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1])\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n| extend RequestBody = todynamic(parse_json(tostring(parse_json(Properties)[\"requestbody\"]))[\"properties\"])\r\n| extend IsArray = iif(array_length(RequestBody) > 0, true, false)\r\n| extend NSG = parse_json(tostring(parse_json(tostring(parse_json(Properties)[\"requestbody\"]))[\"properties\"]))\r\n| extend Rules = NSG[\"securityRules\"]\r\n| where\r\n    isnotempty(Rules) and array_length(Rules) > 0 and\r\n    CategoryValue  == \"Administrative\" and\r\n    ActivityStatusValue in (\"Started\", \"Success\") and\r\n    isempty(OperationName) == false and\r\n    ActionType in (\"ACTION\", \"WRITE\", \"DELETE\") and\r\n    toupper(OperationNameValue) startswith toupper(\"Microsoft.Network/networkSecurityGroups\") and //group only, no rules\r\n    OperationNameValue !has \"securityRules\" and\r\n    ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    TimeGenerated {TimeRange}\r\n| join kind=inner ( //join to get all user related info like IsServicePrincipal, role, name from ActivityStatusValue = Success\r\n            AzureActivity\r\n                | where ActivityStatusValue == \"Success\"\r\n                | extend JoinedAuthorization = Authorization\r\n                | extend JoinedClaims = Claims\r\n                | extend PrincipalType =  parse_json(parse_json(JoinedAuthorization).evidence).principalType\r\n                | extend AppId = parse_json(JoinedClaims)[\"appid\"] //show appid/clientid of registered app if type = ServicePrincipal\r\n                | extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n                | extend RBACRole = parse_json(parse_json(JoinedAuthorization).evidence).role\r\n                | extend SigninUPN = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(JoinedClaims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"])\r\n                | extend SigninName = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(JoinedClaims)[\"name\"])\r\n          ) on CorrelationId\r\n| mv-expand Rules\r\n| extend RuleName = tostring(Rules.name)\r\n| extend Direction = tostring(Rules.properties.direction)\r\n| extend Priority = tostring(Rules.properties.priority)\r\n| extend Protocol = tostring(Rules.properties.protocol)\r\n| extend SourceAddressPrefix = tostring(Rules.properties.sourceAddressPrefix)\r\n| extend SourcePortRange = tostring(Rules.properties.sourcePortRange)\r\n| extend DestinationAddressPrefix = tostring(Rules.properties.destinationAddressPrefix)\r\n| extend DestinationPortRange = tostring(Rules.properties.destinationPortRange)\r\n| extend Description = tostring(Rules.properties.description)\r\n| distinct TimeGenerated,\r\n           SubscriptionId,\r\n           ResourceGroup,\r\n           OperationName,\r\n           Resource,\r\n           RuleName,\r\n           Direction,\r\n           Priority,\r\n           Protocol,\r\n           SourceAddressPrefix, \r\n           DestinationAddressPrefix,\r\n           DestinationPortRange,\r\n           Description,\r\n           SignInAcctType,\r\n           tostring(RBACRole),\r\n           tostring(SigninUPN),\r\n           tostring(SigninName)\r\n\r\n| project TimeGenerated, //for column ordering\r\n           SubscriptionId,\r\n           ResourceGroup,\r\n           OperationName,\r\n           Resource,\r\n           RuleName,\r\n           Direction,\r\n           Priority,\r\n           Protocol,\r\n           SourceAddressPrefix, \r\n           DestinationAddressPrefix,\r\n           DestinationPortRange,\r\n           Description,\r\n           SignInAcctType,\r\n           tostring(RBACRole),\r\n           tostring(SigninUPN),\r\n           tostring(SigninName);\r\n\r\nlet NSGRulesNotGroup =\r\n    AzureActivity\r\n        //| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n        //| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n        | extend CallerIP = CallerIpAddress\r\n        | extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n        | extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n        | extend Resource = toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1])\r\n        | extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n        | extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n        | extend RequestBody = todynamic(parse_json(tostring(parse_json(Properties)[\"requestbody\"]))[\"properties\"])\r\n\r\n        | extend RuleName = Resource\r\n        | extend Direction = tostring(RequestBody.direction)\r\n        | extend Priority = tostring(RequestBody.priority)\r\n        | extend Protocol = tostring(RequestBody.protocol)\r\n        | extend SourceAddressPrefix = tostring(RequestBody.sourceAddressPrefix)\r\n        | extend SourcePortRange = tostring(RequestBody.sourcePortRange)\r\n        | extend DestinationAddressPrefix = tostring(RequestBody.destinationAddressPrefix)\r\n        | extend DestinationPortRange = tostring(RequestBody.destinationPortRange)\r\n        | extend Description = tostring(RequestBody.description)\r\n        //| extend IsArray = iif(array_length(RequestBody) > 0, true, false)\r\n        //| extend NSG = parse_json(tostring(parse_json(tostring(parse_json(Properties)[\"requestbody\"]))[\"properties\"]))\r\n        //| extend Rules = NSG[\"securityRules\"]\r\n        | where\r\n            //isnotempty(Rules) and array_length(Rules) > 0 and\r\n            CategoryValue  == \"Administrative\" and\r\n            ActivityStatusValue in (\"Started\", \"Success\") and\r\n            isempty(OperationName) == false and\r\n            ActionType in (\"ACTION\", \"WRITE\", \"DELETE\") and\r\n            OperationNameValue has \"securityRules\" and //*only rules, union security group above\r\n            ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n            TimeGenerated {TimeRange}\r\n        | join kind=inner ( //join to get all user related info like IsServicePrincipal, role, name from ActivityStatusValue = Success\r\n            AzureActivity\r\n                | where ActivityStatusValue == \"Success\"\r\n                | extend JoinedAuthorization = Authorization\r\n                | extend JoinedClaims = Claims\r\n                | extend PrincipalType =  parse_json(parse_json(JoinedAuthorization).evidence).principalType\r\n                | extend AppId = parse_json(JoinedClaims)[\"appid\"] //show appid/clientid of registered app if type = ServicePrincipal\r\n                | extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n                | extend RBACRole = parse_json(parse_json(JoinedAuthorization).evidence).role\r\n                | extend SigninUPN = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(JoinedClaims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"])\r\n                | extend SigninName = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(JoinedClaims)[\"name\"])\r\n          ) on CorrelationId\r\n        // | mv-expand Rules\r\n         \r\n        // | extend Direction = tostring(Rules.properties.direction)\r\n        // | extend Priority = tostring(Rules.properties.priority)\r\n        // | extend Protocol = tostring(Rules.properties.protocol)\r\n        // | extend SourceAddressPrefix = tostring(Rules.properties.sourceAddressPrefix)\r\n        // | extend SourcePortRange = tostring(Rules.properties.sourcePortRange)\r\n        // | extend DestinationAddressPrefix = tostring(Rules.properties.destinationAddressPrefix)\r\n        // | extend DestinationPortRange = tostring(Rules.properties.destinationPortRange)\r\n        // | extend Description = tostring(Rules.properties.description)\r\n        | distinct TimeGenerated,\r\n                SubscriptionId,\r\n                ResourceGroup,\r\n                OperationName,\r\n                Resource,\r\n                RuleName,\r\n                Direction,\r\n                Priority,\r\n                Protocol,\r\n                SourceAddressPrefix, \r\n                DestinationAddressPrefix,\r\n                DestinationPortRange,\r\n                Description,\r\n                SignInAcctType,\r\n                tostring(RBACRole),\r\n                tostring(SigninUPN),\r\n                tostring(SigninName)\r\n\r\n        | project TimeGenerated, //for column ordering\r\n                SubscriptionId,\r\n                ResourceGroup,\r\n                OperationName,\r\n                Resource,\r\n                RuleName,\r\n                Direction,\r\n                Priority,\r\n                Protocol,\r\n                SourceAddressPrefix, \r\n                DestinationAddressPrefix,\r\n                DestinationPortRange,\r\n                Description,\r\n                SignInAcctType,\r\n                tostring(RBACRole),\r\n                tostring(SigninUPN),\r\n                tostring(SigninName);\r\n\r\nNSGGroup\r\n| union NSGRulesNotGroup\r\n| extend LocalTime = datetime_add('hour',8, TimeGenerated)\r\n| project TimeGenerated=format_datetime(LocalTime, 'dd/MM/yyyy [hh:mm:ss tt]'),\r\n            SubscriptionId,\r\n                ResourceGroup,\r\n                OperationName,\r\n                Resource,\r\n                SignInAcctType,\r\n                tostring(RBACRole),\r\n                tostring(SigninUPN),\r\n                tostring(SigninName),\r\n                RuleName,\r\n                Direction,\r\n                Priority,\r\n                Protocol,\r\n                SourceAddressPrefix, \r\n                DestinationAddressPrefix,\r\n                DestinationPortRange,\r\n                Description\r\n\r\n                \r\n\r\n\r\n// | project Resource, ActivityStatusValue, RequestBody, SecurityRules\r\n\r\n// | project TimeGenerated, SubscriptionId, ResourceGroup, ActionType, Resource, ActivityStatusValue, RequestBody, SecurityRules,  SignInAcctType, RBACRole, SigninUPN, SigninName",
         "size": 0,
+        "noDataMessage": "No changes",
         "timeContext": {
-          "durationMs": 2419200000
+          "durationMs": 2592000000
         },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
@@ -279,19 +284,52 @@
               }
             },
             {
+              "columnMatch": "TimeGenerated",
+              "formatter": 5
+            },
+            {
               "columnMatch": "SubscriptionId",
               "formatter": 5
             },
             {
               "columnMatch": "ResourceGroup",
               "formatter": 5
+            },
+            {
+              "columnMatch": "OperationName",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "32ch"
+              }
+            },
+            {
+              "columnMatch": "Resource",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "18ch"
+              }
+            },
+            {
+              "columnMatch": "RuleName",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "28ch"
+              }
+            },
+            {
+              "columnMatch": "Direction",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "11ch"
+              }
             }
           ],
           "hierarchySettings": {
             "treeType": 1,
             "groupBy": [
               "SubscriptionId",
-              "ResourceGroup"
+              "ResourceGroup",
+              "TimeGenerated"
             ],
             "expandTopLevel": true
           }
@@ -310,10 +348,238 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "AzureActivity\r\n| extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType\r\n| extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n| extend RBACRole = parse_json(parse_json(Authorization).evidence).role\r\n| extend SigninUPN = parse_json(Claims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"]\r\n| extend SigninName = parse_json(Claims)[\"name\"]\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = strcat(\r\n        toupper(ResourceIDSplit[array_length(ResourceIDSplit)-2]), \"/\",\r\n        toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1]), \"/\"\r\n    )\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n| where\r\n    PrincipalType != \"ServicePrincipal\" and \r\n    ActionType in (\"ACTION\", \"WRITE\", \"DELETE\") and toupper(OperationNameValue) startswith toupper(\"Microsoft.Network/azureFirewalls\") and\r\n    OperationNameValue !in (\r\n    \"MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE\",\r\n    \"MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE\") and\r\n    CategoryValue  == \"Administrative\" and ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    ActivityStatusValue == \"Success\" and TimeGenerated {TimeRange}\r\n    | project TimeGenerated, SubscriptionId, ResourceGroup, ActionType, Resource, SignInAcctType, RBACRole, SigninUPN, SigninName",
+        "query": "let AzFWActivities = AzureActivity\r\n| extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n| extend Resource = toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1])\r\n| extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n\r\n| extend RequestBody = parse_json(tostring(parse_json(Properties)[\"requestbody\"]))[\"properties\"]\r\n\r\n| where\r\n    CategoryValue  == \"Administrative\" and\r\n    ActivityStatusValue in (\"Started\", \"Success\") and\r\n    isempty(OperationName) == false and\r\n    toupper(OperationNameValue) startswith toupper(\"Microsoft.Network/azureFirewalls\") and\r\n    ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\") and\r\n    TimeGenerated {TimeRange}\r\n| join kind=inner ( //join to get all user related info like IsServicePrincipal, role, name from ActivityStatusValue = Success\r\n            AzureActivity\r\n                | where ActivityStatusValue == \"Success\"\r\n                | extend JoinedAuthorization = Authorization\r\n                | extend JoinedClaims = Claims\r\n                | extend PrincipalType =  parse_json(parse_json(JoinedAuthorization).evidence).principalType\r\n                | extend AppId = parse_json(JoinedClaims)[\"appid\"] //show appid/clientid of registered app if type = ServicePrincipal\r\n                | extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n                | extend RBACRole = parse_json(parse_json(JoinedAuthorization).evidence).role\r\n                | extend SigninUPN = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(JoinedClaims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"])\r\n                | extend SigninName = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(JoinedClaims)[\"name\"])\r\n          ) on CorrelationId, _ResourceId\r\n\r\n//distinct due to activity log inserts multiple entries for every activity with different statues Accepted, Started, Success\r\n| distinct TimeGenerated, \r\n           SubscriptionId,\r\n           ResourceGroup,\r\n           Resource,\r\n           OperationName,\r\n           SignInAcctType,\r\n           tostring(RBACRole),\r\n           tostring(SigninUPN),\r\n           tostring(SigninName),\r\n           CorrelationId,\r\n           _ResourceId;\r\n\r\nAzFWActivities\r\n| extend LocalTime = datetime_add('hour',8, TimeGenerated)\r\n| project LocalTime, //column ordering\r\n           SubscriptionId,\r\n           ResourceGroup,\r\n           OperationName,\r\n           Firewall=Resource,\r\n           SignInAcctType,\r\n           tostring(RBACRole),\r\n           tostring(SigninUPN),\r\n           tostring(SigninName),\r\n           CorrelationId,\r\n           ResourceId = _ResourceId",
         "size": 0,
+        "noDataMessage": "No changes",
         "timeContext": {
-          "durationMs": 2419200000
+          "durationMs": 2592000000
+        },
+        "timeContextFromParameter": "TimeRange",
+        "exportedParameters": [
+          {
+            "fieldName": "CorrelationId",
+            "parameterName": "CorrelationId",
+            "parameterType": 1,
+            "defaultValue": "\"\""
+          },
+          {
+            "fieldName": "ResourceId",
+            "parameterName": "ResourceId",
+            "parameterType": 1,
+            "defaultValue": "\"\""
+          }
+        ],
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "$gen_group",
+              "formatter": 13,
+              "formatOptions": {
+                "linkTarget": null,
+                "showIcon": true,
+                "customColumnWidthSetting": "30ch"
+              }
+            },
+            {
+              "columnMatch": "LocalTime",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "26ch"
+              }
+            },
+            {
+              "columnMatch": "SubscriptionId",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "ResourceGroup",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "OperationName",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "38ch"
+              }
+            },
+            {
+              "columnMatch": "CorrelationId",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "ResourceId",
+              "formatter": 5
+            }
+          ],
+          "hierarchySettings": {
+            "treeType": 1,
+            "groupBy": [
+              "SubscriptionId",
+              "ResourceGroup"
+            ],
+            "expandTopLevel": true
+          },
+          "labelSettings": [
+            {
+              "columnId": "LocalTime",
+              "label": "Local Time"
+            },
+            {
+              "columnId": "SubscriptionId"
+            },
+            {
+              "columnId": "ResourceGroup"
+            },
+            {
+              "columnId": "OperationName",
+              "label": "What was done"
+            },
+            {
+              "columnId": "Firewall"
+            },
+            {
+              "columnId": "SignInAcctType",
+              "label": "Account Type"
+            },
+            {
+              "columnId": "RBACRole",
+              "label": "RBAC Role"
+            },
+            {
+              "columnId": "SigninUPN",
+              "label": "SignIn ID"
+            },
+            {
+              "columnId": "SigninName",
+              "label": "SignIn Name"
+            },
+            {
+              "columnId": "CorrelationId"
+            },
+            {
+              "columnId": "ResourceId"
+            }
+          ]
+        }
+      },
+      "name": "query - 7"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "e944f34b-cda5-4ded-a9eb-2a0aadb7ebfc",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Application Rule",
+            "subTarget": "AppRule",
+            "style": "link"
+          },
+          {
+            "id": "dfe9c31d-7f7f-4bf2-99c9-4f1adf7a5cc0",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Network Rule",
+            "subTarget": "NetRule",
+            "style": "link"
+          },
+          {
+            "id": "738d5718-41fd-4fa5-b9b5-e7910c4bb9fd",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "NAT Rule",
+            "subTarget": "NATRule",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 9"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "\r\nAzureActivity\r\n| extend LocalTime = datetime_add('hour',8, TimeGenerated)\r\n// | extend CallerIP = CallerIpAddress\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n// | extend ResourceIDSplit = split(_ResourceId, \"/\")\r\n// | extend Resource = toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1])\r\n// | extend ActionNamespace = split(parse_json(Authorization).action, \"/\")\r\n// | extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])\r\n\r\n| extend RequestBody = parse_json(tostring(parse_json(Properties)[\"requestbody\"]))[\"properties\"]\r\n| extend AppRulesCollection = RequestBody[\"applicationRuleCollections\"]\r\n\r\n| mv-expand AppRulesCollection\r\n| extend CollectionName = AppRulesCollection[\"name\"]\r\n| extend CollectionProps = AppRulesCollection[\"properties\"]\r\n    //| mv-expand CollectionProps\r\n    | extend Action = CollectionProps[\"action\"][\"type\"]\r\n    | extend Rules = CollectionProps[\"rules\"]\r\n        | mv-expand Rules\r\n        | extend RuleName = Rules[\"name\"]\r\n        | extend priority = Rules[\"priority\"]\r\n        | extend Direction = Rules[\"direction\"]\r\n        | extend Protocols = Rules[\"protocols\"]\r\n        | extend SourceIpGroups = Rules[\"sourceIpGroups\"]\r\n        | extend SourceAddresses = Rules[\"sourceAddresses\"]\r\n        | extend TargetFqdns = Rules[\"targetFqdns\"]\r\n//| extend NatRules = RequestBody[\"natRuleCollections\"]\r\n//| extend NetRules = RequestBody[\"networkRuleCollections\"]\r\n| where\r\n    //LocalTime == todatetime(\"2020-09-15T14:20:17.088Z\") and\r\n    CorrelationId == \"{CorrelationId}\" and //\"ec403a1c-f36d-4c22-b7c1-b1f33c75f3c9\" and\r\n    _ResourceId == \"{ResourceId}\" and//\"/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourcegroups/rggccshol/providers/microsoft.network/azurefirewalls/azfwgccshol\" and\r\n    CategoryValue  == \"Administrative\" and\r\n    ActivityStatusValue == \"Started\" //and //select only 1 entry of the same activity\r\n\r\n| project\r\n    CollectionName,\r\n    Action,\r\n    RuleName,\r\n    priority,\r\n    Direction,\r\n    Protocols,\r\n    SourceIpGroups,\r\n    SourceAddresses,\r\n    TargetFqdns\r\n\r\n\r\n\r\n    // toupper(OperationNameValue) startswith toupper(\"Microsoft.Network/azureFirewalls\") and\r\n    // ResourceCategory !in (\"MICROSOFT.RESOURCEHEALTH\", \"MICROSOFT.RESOURCES\")\r\n    \r\n\r\n\r\n\r\n// | join kind=inner ( //join to get all user related info like IsServicePrincipal, role, name from ActivityStatusValue = Success\r\n//             AzureActivity\r\n//                 | where ActivityStatusValue == \"Success\"\r\n//                 | extend JoinedAuthorization = Authorization\r\n//                 | extend JoinedClaims = Claims\r\n//                 | extend PrincipalType =  parse_json(parse_json(JoinedAuthorization).evidence).principalType\r\n//                 | extend AppId = parse_json(JoinedClaims)[\"appid\"] //show appid/clientid of registered app if type = ServicePrincipal\r\n//                 | extend SignInAcctType = iif(PrincipalType == \"\", \"User\", PrincipalType)\r\n//                 | extend RBACRole = parse_json(parse_json(JoinedAuthorization).evidence).role\r\n//                 | extend SigninUPN = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(JoinedClaims)[\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn\"])\r\n//                 | extend SigninName = iif(SignInAcctType == \"ServicePrincipal\",AppId, parse_json(JoinedClaims)[\"name\"])\r\n//           ) on CorrelationId, _ResourceId\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n// | join kind=inner\r\n//   ( AzureActivity\r\n    \r\n//     | extend Props = parse_json(tostring(parse_json(tostring(parse_json(Properties)[\"requestbody\"]))[\"properties\"]))[\"securityRules\"]\r\n\r\n\r\n    \r\n//     //| where isempty(SecurityRulesJArray) == false and array_length(SecurityRulesJArray) > 0\r\n//   ) on CorrelationId\r\n// | mv-expand SecurityRulesJArray\r\n// | distinct TimeGenerated,\r\n//            SubscriptionId,\r\n//            ResourceGroup,\r\n//            ActionType,\r\n//            OperationName,\r\n//            Resource,\r\n//            tostring(RequestBody),\r\n//            tostring(SecurityRulesJArray.name),\r\n//            tostring(SecurityRulesJArray),  SignInAcctType, tostring(RBACRole), tostring(SigninUPN), tostring(SigninName)\r\n\r\n// | project Resource, ActivityStatusValue, RequestBody, SecurityRules\r\n\r\n// | project TimeGenerated, SubscriptionId, ResourceGroup, ActionType, Resource, ActivityStatusValue, RequestBody, SecurityRules,  SignInAcctType, RBACRole, SigninUPN, SigninName",
+        "size": 1,
+        "noDataMessage": "Select a Firewall activity above",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "RuleName",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "32ch"
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "CollectionName",
+              "label": "Rule Collection Name"
+            },
+            {
+              "columnId": "Action"
+            },
+            {
+              "columnId": "RuleName"
+            },
+            {
+              "columnId": "priority",
+              "label": "Priority"
+            },
+            {
+              "columnId": "Direction"
+            },
+            {
+              "columnId": "Protocols"
+            },
+            {
+              "columnId": "SourceIpGroups"
+            },
+            {
+              "columnId": "SourceAddresses"
+            },
+            {
+              "columnId": "TargetFqdns"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "AppRule"
+      },
+      "name": "query - 8"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "\r\nAzureActivity\r\n| extend LocalTime = datetime_add('hour',8, TimeGenerated)\r\n\r\n| extend ResourceCategory = parse_json(Properties).resourceProviderValue\r\n| extend RequestBody = parse_json(tostring(parse_json(Properties)[\"requestbody\"]))[\"properties\"]\r\n| extend NatRulesCollection = RequestBody[\"natRuleCollections\"]\r\n\r\n | mv-expand NatRulesCollection\r\n | extend CollectionName = NatRulesCollection[\"name\"]\r\n | extend CollectionProps = NatRulesCollection[\"properties\"]\r\n //| mv-expand CollectionProps\r\n     | extend Action = CollectionProps[\"action\"][\"type\"]\r\n     | extend Priority = CollectionProps[\"priority\"]\r\n     | extend Rules = CollectionProps[\"rules\"]\r\n        | mv-expand Rules\r\n        | extend RuleName = Rules[\"name\"]\r\n        | extend Protocols = Rules[\"protocols\"]\r\n        | extend SourceIpGroups = Rules[\"sourceIpGroups\"]\r\n        | extend SourceAddresses = Rules[\"sourceAddresses\"]\r\n        | extend DestinationAddresses = Rules[\"destinationAddresses\"]\r\n        | extend DestinationPorts = Rules[\"destinationPorts\"]\r\n        | extend TranslatedAddress = Rules[\"translatedAddress\"]\r\n        | extend TranslatedPort = Rules[\"translatedPort\"]\r\n//| extend NetRules = RequestBody[\"networkRuleCollections\"]\r\n| where\r\n    CorrelationId == \"{CorrelationId}\" and \r\n    _ResourceId == \"{ResourceId}\" and\r\n    CategoryValue  == \"Administrative\" and\r\n    ActivityStatusValue == \"Started\" //and //select only 1 entry of the same activity\r\n\r\n| project\r\n    CollectionName,\r\n    RuleName,\r\n    Action,\r\n    Priority,\r\n    Protocols,\r\n    SourceIpGroups,\r\n    SourceAddresses,\r\n    DestinationAddresses,\r\n    DestinationPorts,\r\n    TranslatedAddress,\r\n    TranslatedPort",
+        "size": 1,
+        "noDataMessage": "Select a Firewall activity above",
+        "timeContext": {
+          "durationMs": 0
         },
         "timeContextFromParameter": "TimeRange",
         "queryType": 0,
@@ -323,7 +589,12 @@
         ],
         "visualization": "table"
       },
-      "name": "query - 7"
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "NATRule"
+      },
+      "name": "query - 10"
     }
   ],
   "fallbackResourceIds": [
