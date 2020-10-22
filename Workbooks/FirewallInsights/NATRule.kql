@@ -4,7 +4,6 @@
 // Categories: Network,Security
 // Resource types: Firewalls
 // Topic: Firewall Logs
-
 AzureDiagnostics
 | where Category == "AzureFirewallNetworkRule"
 //using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields
@@ -23,21 +22,16 @@ AzureDiagnostics
 //case 2: for ICMP records
 //ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow
 | parse msg_s with Protocol2 " request from " SourceIP2 " to " TargetIP2 ". Action: " Action2
-| extend
-SourcePort = tostring(SourcePortInt),
-TargetPort = tostring(TargetPortInt)
-| extend 
-    Action = case(Action1a == "", case(Action1b == "",Action2,Action1b), Action1a),
-    Protocol = case(Protocol == "", Protocol2, Protocol),
-    SourceIP = case(SourceIP == "", SourceIP2, SourceIP),
-    TargetIP = case(TargetIP == "", TargetIP2, TargetIP),
-    //ICMP records don't have port information
-    SourcePort = case(SourcePort == "", "N/A", SourcePort),
-TargetPort = case(TargetPort == "", "N/A", TargetPort),
-    //Regular network rules don't have a DNAT destination
-    IsNat = case(NatDestination == "", false, true),
-    NatDestination = case(NatDestination == "", "N/A", NatDestination)
-| where IsNat == true
-| project 
-    DateTime = datetime_add("hour", 8, TimeGenerated),
-    Protocol, SourceIP,SourcePort,TargetIP,TargetPort, NatDestination //, Action, msg_s
+| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)
+| extend       Action = case(Action1a == "", case(Action1b == "",Action2,Action1b), Action1a),      Protocol = case(Protocol == "", Protocol2, Protocol),      SourceIP = case(SourceIP == "", SourceIP2, SourceIP),      TargetIP = case(TargetIP == "", TargetIP2, TargetIP),
+//ICMP records don't have port information
+SourcePort = case(SourcePort == "", "N/A", SourcePort),  TargetPort = case(TargetPort == "", "N/A", TargetPort),
+//Regular network rules don't have a DNAT destination
+IsNat = case(NatDestination == "", false, true),      NatDestination = case(NatDestination == "", "N/A", NatDestination)
+| where
+    IsNat == true and
+    Resource =~ "{Firewall:name}" and
+    TimeGenerated {TimeRange}
+| project       DateTime = datetime_add("hour", 8, TimeGenerated),
+Protocol, SourceIP,SourcePort,TargetIP,TargetPort, NatDestination
+//, Action, msg_s
