@@ -1,4 +1,6 @@
-//Original author: Billy York
+// Author: Billy York
+// GitHub: https://github.com/scautomation
+
 Heartbeat
 | where TimeGenerated {TimeRange} and OSType=="Linux" and notempty(Computer)
 | summarize arg_max(TimeGenerated, Solutions, Computer, ResourceId, ComputerEnvironment, VMUUID) by SourceComputerId

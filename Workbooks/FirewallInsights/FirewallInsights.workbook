@@ -1,0 +1,442 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
+        "parameters": [
+          {
+            "id": "17eecd5d-e68a-4ee6-a557-7ac12a57e4a7",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "value": [
+              "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206",
+              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "includeAll": true,
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1"
+          },
+          {
+            "id": "2425679f-dc88-4de7-8afa-0df027057775",
+            "version": "KqlParameterItem/1.0",
+            "name": "Workspace",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "",
+            "delimiter": ",",
+            "query": "where type =~ 'microsoft.operationalinsights/workspaces'\r\n| order by name asc\r\n| project value = id, label = id",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1",
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "1f40c283-b593-4a1b-84e1-c9a7367c54db",
+            "version": "KqlParameterItem/1.0",
+            "name": "Firewall",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "where type =~ 'Microsoft.Network/azureFirewalls'\r\n| order by name asc\r\n| project value = id, label = id",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": [
+              "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Network/azureFirewalls/azfw-gcc"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1",
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "2b92507d-be7e-4372-bbba-e942b579bfd8",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time Range",
+            "type": 4,
+            "isRequired": true,
+            "value": {
+              "durationMs": 86400000
+            },
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ],
+              "allowCustom": true
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "parameters - 1"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "### Traffic Processed by Rule Type for {TimeRange}  \r\nselected firewall: {Firewall:label}"
+      },
+      "name": "text - 3"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureActivity  \r\n| summarize AggregatedValue = count() by ActivityStatusValue\r\n| order by AggregatedValue  desc",
+        "size": 4,
+        "title": "Traffics Processed By Rule Type",
+        "noDataMessage": "No changes",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "piechart",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "ActivityStatus",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "AggregatedValue",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "name": "query - 14",
+      "styleSettings": {
+        "margin": "0px",
+        "padding": "0px"
+      }
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "f3e3ad88-9f2b-47bf-aeee-23bfa0a092e0",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "NAT Rule",
+            "subTarget": "NAT",
+            "preText": "NAT Rule",
+            "style": "link"
+          },
+          {
+            "id": "b736d9b8-b0ae-4b00-9528-f99470205e9c",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Network Rule",
+            "subTarget": "NET",
+            "preText": "Network Rule",
+            "style": "link"
+          },
+          {
+            "id": "7e78fee4-df7f-4db5-b00a-71822ab20ced",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Application Rule",
+            "subTarget": "APP",
+            "style": "link"
+          },
+          {
+            "id": "acb0c405-2c3d-4b50-ae24-1de1e362c4b3",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Threat Intelligence",
+            "subTarget": "THREAT",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 7"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\n\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend\r\nSourcePort = tostring(SourcePortInt),\r\nTargetPort = tostring(TargetPortInt)\r\n| extend \r\n    Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),\r\n    Protocol = case(Protocol == \"\", Protocol2, Protocol),\r\n    SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),\r\n    TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n    //ICMP records don't have port information\r\n    SourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),\r\nTargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n    //Regular network rules don't have a DNAT destination\r\n    IsNat = case(NatDestination == \"\", false, true),\r\n    NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where IsNat == true\r\n| project \r\n    DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\n    Protocol, SourceIP,SourcePort,TargetIP,TargetPort, NatDestination //, Action, msg_s",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "DateTime",
+              "formatter": 6,
+              "formatOptions": {
+                "customColumnWidthSetting": "27ch"
+              }
+            },
+            {
+              "columnMatch": "Protocol",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "11ch"
+              }
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "NAT"
+      },
+      "name": "query - 16"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "91990442-2861-43e5-b9dc-1c5d00fef4b7",
+            "cellValue": "selectedNetTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Allowed Traffic",
+            "subTarget": "NETALLOW",
+            "style": "link"
+          },
+          {
+            "id": "b21cc278-1352-40a6-abe2-79d036e1d5b0",
+            "cellValue": "selectedNetTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Denied Traffic",
+            "subTarget": "NETDENY",
+            "style": "link"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "NET"
+      },
+      "name": "links - 6"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)\r\n| extend       Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),      Protocol = case(Protocol == \"\", Protocol2, Protocol),      SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),      TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n//ICMP records don't have port information\r\nSourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),  TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n//Regular network rules don't have a DNAT destination\r\nIsNat = case(NatDestination == \"\", false, true),      NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where\r\n    IsNat == false and\r\n    Action == \"Allow\"\r\n| project\r\n    DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\n    Protocol, SourceIP,SourcePort,TargetIP,TargetPort, Action //, msg_s",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "DateTime",
+              "formatter": 6,
+              "formatOptions": {
+                "customColumnWidthSetting": "27ch"
+              }
+            },
+            {
+              "columnMatch": "Protocol",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "11ch"
+              }
+            }
+          ]
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "NET"
+        },
+        {
+          "parameterName": "selectedNetTab",
+          "comparison": "isEqualTo",
+          "value": "NETALLOW"
+        }
+      ],
+      "name": "query - 16 - Copy"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)\r\n| extend       Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),      Protocol = case(Protocol == \"\", Protocol2, Protocol),      SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),      TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n//ICMP records don't have port information\r\nSourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),  TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n//Regular network rules don't have a DNAT destination\r\nIsNat = case(NatDestination == \"\", false, true),      NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where\r\n    IsNat == false and\r\n    Action == \"Deny\"\r\n| project\r\n    DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\n    Protocol, SourceIP,SourcePort,TargetIP,TargetPort, Action //, msg_s",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "DateTime",
+              "formatter": 6,
+              "formatOptions": {
+                "customColumnWidthSetting": "27ch"
+              }
+            },
+            {
+              "columnMatch": "Protocol",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "11ch"
+              }
+            }
+          ]
+        }
+      },
+      "conditionalVisibilities": [
+        {
+          "parameterName": "selectedTab",
+          "comparison": "isEqualTo",
+          "value": "NET"
+        },
+        {
+          "parameterName": "selectedNetTab",
+          "comparison": "isEqualTo",
+          "value": "NETDENY"
+        }
+      ],
+      "name": "query - 16 - Copy - Copy"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

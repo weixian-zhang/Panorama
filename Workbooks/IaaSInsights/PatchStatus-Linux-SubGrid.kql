@@ -1,3 +1,6 @@
+// Author: Billy York
+// GitHub: https://github.com/scautomation
+
 Update
 | where TimeGenerated  {TimeRange} and OSType=="Linux" and Computer == '{SelectedComputer}'
 | summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification, BulletinUrl, BulletinID) by Computer, SourceComputerId, Product, ProductArch
