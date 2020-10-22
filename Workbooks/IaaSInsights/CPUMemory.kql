@@ -1,0 +1,23 @@
+InsightsMetrics
+| where Namespace == "Memory" and Name == "AvailableMB" and TimeGenerated {TimeRange:value}
+| extend SplitRscId = split(_ResourceId, "/")
+| extend ResourceGroup = SplitRscId[4]
+| extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])
+| extend DomainName = Computer
+| extend AvailableGB = round(Val/1000,1)
+| extend TotalMemoryGB = round(todecimal(tostring(parse_json(Tags)["vm.azm.ms/memorySizeMB"])) / 1000,1)
+| where VMName in (split(tolower("{VirtualMachines:name}"), ", "))
+| summarize AvailableGB=min(AvailableGB) by tostring(ResourceGroup), VMName, DomainName, TotalMemoryGB, CompositeMemDiff=TotalMemoryGB
+| join kind=inner 
+  ( InsightsMetrics
+    | where Namespace == "Processor" and Name == "UtilizationPercentage"
+    and TimeGenerated {TimeRange:value}
+    | extend SplitRscId = split(_ResourceId, "/")
+    | extend DomainName = Computer
+    | extend Cores = tostring(parse_json(Tags)["vm.azm.ms/totalCpus"])
+    | extend CPUPercent = round(Val,1)
+    | extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])
+    | summarize CPUPercent=min(CPUPercent) by VMName, DomainName, Cores
+  )
+  on VMName
+| project ResourceGroup, VMName, DomainName, Cores, CPUPercent, AvailableGB, TotalMemoryGB, CompositeMemDiff=TotalMemoryGB

@@ -1,0 +1,6 @@
+Update
+| where TimeGenerated>ago(5h) and OSType=="Linux"
+| summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification) by Computer, SourceComputerId, Product, ProductArch
+| where UpdateState=~"Needed"
+| summarize by Product, ProductArch, Classification, Computer
+| summarize count(Classification) by Classification

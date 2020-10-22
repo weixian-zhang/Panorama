@@ -1,0 +1,22 @@
+Perf
+| where ObjectName == "LogicalDisk" 
+| where CounterName == "Free Megabytes" and 
+  InstanceName !in ("_Total") and InstanceName !contains "HarddiskVolume" and TimeGenerated {TimeRange:value}
+| extend SplitRscId = split(_ResourceId, "/")
+| where SplitRscId[(array_length(SplitRscId) - 4)] != "virtualmachinescalesets"
+| extend DomainName = Computer
+| extend FreeSpaceGB = round((CounterValue / 1000),1)
+| extend VMName = tostring(SplitRscId[(array_length(SplitRscId) - 1)])
+| where VMName in (split(tolower("{VirtualMachines:name}"), ", "))
+| summarize round(min(FreeSpaceGB), 1) by VMName, DomainName, InstanceName //, SVMs
+| join kind=inner 
+  (Perf
+        | where ObjectName == "LogicalDisk" and
+          CounterName == "% Free Space" and
+          TimeGenerated {TimeRange:value}
+        | extend DomainName = Computer
+        | extend FreePercent = round(CounterValue,1)
+        | extend UsedPercent = round((100 - FreePercent),1)
+        | extend Total = FreePercent + UsedPercent
+        | summarize min(FreePercent), min(UsedPercent) by DomainName, Total
+   ) on DomainName

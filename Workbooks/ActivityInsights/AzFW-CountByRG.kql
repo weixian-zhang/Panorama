@@ -1,0 +1,10 @@
+AzureActivity
+| extend ResourceCategory = parse_json(Properties).resourceProviderValue
+| where
+    CategoryValue  == "Administrative" and
+    ActivityStatusValue in ("Success", "Succeeded") and
+    isempty(OperationName) == false and
+    toupper(OperationNameValue) startswith toupper("Microsoft.Network/azureFirewalls") and
+    ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
+    TimeGenerated > ago(2d)
+| summarize dcount(CorrelationId) by ResourceGroup

@@ -1,10 +1,23 @@
+let distinctActivities = AzureActivity
+| extend ResourceCategory = parse_json(Properties).resourceProviderValue
+| extend ActionNamespace = split(parse_json(Authorization).action, "/")
+| extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])
+| where
+    ActionType in ("WRITE", "DELETE") and
+    CategoryValue  == "Administrative" and 
+    ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
+    ActivityStatusValue == "Success" and 
+    TimeGenerated {TimeRange}
+| distinct CorrelationId;
+
+
 AzureActivity
 | extend PrincipalType =  parse_json(parse_json(Authorization).evidence).principalType
 | extend SignInAcctType = iif(PrincipalType == "", "User", PrincipalType)
 | extend AppId = parse_json(Claims)["appid"] //show appid/clientid of registered app if type = ServicePrincipal
 | extend RBACRole = parse_json(parse_json(Authorization).evidence).role
 | extend SigninUPN = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(Claims)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"])
-                | extend SigninName = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(Claims)["name"])
+| extend SigninName = iif(SignInAcctType == "ServicePrincipal",AppId, parse_json(Claims)["name"])
 | extend CallerIP = CallerIpAddress
 | extend ResourceCategory = parse_json(Properties).resourceProviderValue
 | extend ResourceIDSplit = split(_ResourceId, "/")
@@ -12,13 +25,8 @@ AzureActivity
          toupper(ResourceIDSplit[array_length(ResourceIDSplit)-1]))
 | extend ActionNamespace = split(parse_json(Authorization).action, "/")
 | extend ActionType = toupper(ActionNamespace[array_length(ActionNamespace) -1])
+| join (distinctActivities) on CorrelationId
 | where
-    ActionType in ("WRITE", "DELETE") and
-    OperationNameValue !in (
-    "MICROSOFT.AUTHORIZATION/POLICYDEFINITIONS/WRITE",
-    "MICROSOFT.AUTHORIZATION/POLICYSETDEFINITIONS/WRITE",
-    "MICROSOFT.AUTHORIZATION/POLICYASSIGNMENTS/WRITE") and
-    CategoryValue  == "Administrative" and ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
-    ActivityStatusValue == "Success" and TimeGenerated {TimeRange}
-| project TimeGenerated, SubscriptionId, ResourceGroup, ResourceCategory,
-          Resource, ActionType, SignInAcctType, RBACRole, SigninUPN, SigninName
+    ResourceCategory != ""
+| project tostring(parse_json(Properties).resourceProviderValue),CorrelationId, TimeGenerated, SubscriptionId, ResourceGroup, ActionType, ResourceCategory,
+          Resource, SignInAcctType, RBACRole, SigninUPN, SigninName
