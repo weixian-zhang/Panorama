@@ -34,8 +34,8 @@ AzureDiagnostics
     FQDN = case(FQDN == "", "N/A", FQDN),
     TargetPort = case(TargetPort == "", "N/A", TargetPort)
 | where Action == "Deny" and
-Resource =~ "{Firewall:name}" and
     TimeGenerated {TimeRange}
 | project
     DateTime =  datetime_add("hour",8, TimeGenerated),
+    Firewall = Resource,
     RuleCollection, Rule, Protocol, SourceIP, SourcePort, FQDN, TargetPort, Action

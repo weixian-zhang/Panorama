@@ -5,9 +5,6 @@
       "type": 9,
       "content": {
         "version": "KqlParameterItem/1.0",
-        "crossComponentResources": [
-          "{Subscription}"
-        ],
         "parameters": [
           {
             "id": "17eecd5d-e68a-4ee6-a557-7ac12a57e4a7",
@@ -49,6 +46,7 @@
               "{Subscription}"
             ],
             "value": [
+              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352/resourceGroups/CH-OpsRG-Pri/providers/Microsoft.OperationalInsights/workspaces/CH-LA",
               "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.OperationalInsights/workspaces/laa-gccshol"
             ],
             "typeSettings": {
@@ -66,28 +64,6 @@
             "resourceType": "microsoft.resourcegraph/resources"
           },
           {
-            "id": "1f40c283-b593-4a1b-84e1-c9a7367c54db",
-            "version": "KqlParameterItem/1.0",
-            "name": "Firewall",
-            "type": 5,
-            "isRequired": true,
-            "query": "where type =~ 'Microsoft.Network/azureFirewalls'\r\n| order by name asc\r\n| project value = id, label = id",
-            "crossComponentResources": [
-              "{Subscription}"
-            ],
-            "value": "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352/resourceGroups/CH-OpsRG-Sec/providers/Microsoft.Network/azureFirewalls/CH-FW",
-            "typeSettings": {
-              "additionalResourceOptions": [],
-              "showDefault": false
-            },
-            "timeContext": {
-              "durationMs": 86400000
-            },
-            "defaultValue": "value::1",
-            "queryType": 1,
-            "resourceType": "microsoft.resourcegraph/resources"
-          },
-          {
             "id": "2b92507d-be7e-4372-bbba-e942b579bfd8",
             "version": "KqlParameterItem/1.0",
             "name": "TimeRange",
@@ -95,8 +71,8 @@
             "type": 4,
             "isRequired": true,
             "value": {
-              "durationMs": 4406400000,
-              "endTime": "2020-10-22T14:28:00.000Z"
+              "durationMs": 345600000,
+              "endTime": "2020-10-14T06:21:00.000Z"
             },
             "typeSettings": {
               "selectableValues": [
@@ -154,63 +130,10 @@
           }
         ],
         "style": "pills",
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources"
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
       },
       "name": "parameters - 1"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "### Traffic Processed by Rule Type for {TimeRange}  \r\nselected firewall: {Firewall:label}"
-      },
-      "name": "text - 3"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "AzureActivity  \r\n| summarize AggregatedValue = count() by ActivityStatusValue\r\n| order by AggregatedValue  desc",
-        "size": 4,
-        "title": "Traffics Processed By Rule Type",
-        "noDataMessage": "No changes",
-        "timeContext": {
-          "durationMs": 86400000
-        },
-        "timeContextFromParameter": "TimeRange",
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces",
-        "crossComponentResources": [
-          "{Workspace}"
-        ],
-        "visualization": "piechart",
-        "tileSettings": {
-          "showBorder": false,
-          "titleContent": {
-            "columnMatch": "ActivityStatus",
-            "formatter": 1
-          },
-          "leftContent": {
-            "columnMatch": "AggregatedValue",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "auto"
-            },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "maximumSignificantDigits": 3,
-                "maximumFractionDigits": 2
-              }
-            }
-          }
-        }
-      },
-      "name": "query - 14",
-      "styleSettings": {
-        "margin": "0px",
-        "padding": "0px"
-      }
     },
     {
       "type": 11,
@@ -257,15 +180,78 @@
       "name": "links - 7"
     },
     {
+      "type": 1,
+      "content": {
+        "json": "#### Threat Alert from {TimeRange:start} -> {TimeRange:end} "
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "THREAT"
+      },
+      "name": "text - 3"
+    },
+    {
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)\r\n| extend       Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),      Protocol = case(Protocol == \"\", Protocol2, Protocol),      SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),      TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n//ICMP records don't have port information\r\nSourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),  TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n//Regular network rules don't have a DNAT destination\r\nIsNat = case(NatDestination == \"\", false, true),      NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where\r\n    IsNat == true and\r\n    Resource =~ \"{Firewall:name}\" and\r\n    TimeGenerated {TimeRange}\r\n| project       DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\nProtocol, SourceIP,SourcePort,TargetIP,TargetPort, NatDestination\r\n//, Action, msg_s",
+        "query": "AzureDiagnostics\r\n| where OperationName  == \"AzureFirewallThreatIntelLog\"\r\n| make-series ThreatCount=count() on TimeGenerated from todatetime({TimeRange:start}) to now() step 1hour",
+        "size": 1,
+        "noDataMessage": "No threat found",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "timechart",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "ActivityStatus",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "AggregatedValue",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "THREAT"
+      },
+      "name": "query - 14",
+      "styleSettings": {
+        "margin": "0px",
+        "padding": "0px"
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)\r\n| extend       Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),      Protocol = case(Protocol == \"\", Protocol2, Protocol),      SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),      TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n//ICMP records don't have port information\r\nSourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),  TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n//Regular network rules don't have a DNAT destination\r\nIsNat = case(NatDestination == \"\", false, true),      NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where\r\n    IsNat == true and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\n    Firewall = Resource,\r\nProtocol, SourceIP,SourcePort,TargetIP,TargetPort, NatDestination\r\n//, Action, msg_s",
         "size": 0,
         "timeContext": {
           "durationMs": 0
         },
         "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "crossComponentResources": [
@@ -288,7 +274,8 @@
                 "customColumnWidthSetting": "11ch"
               }
             }
-          ]
+          ],
+          "filter": true
         }
       },
       "conditionalVisibility": {
@@ -296,7 +283,7 @@
         "comparison": "isEqualTo",
         "value": "NAT"
       },
-      "name": "query - 16"
+      "name": "Step-NatGrid"
     },
     {
       "type": 11,
@@ -333,12 +320,13 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)\r\n| extend       Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),      Protocol = case(Protocol == \"\", Protocol2, Protocol),      SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),      TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n//ICMP records don't have port information\r\nSourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),  TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n//Regular network rules don't have a DNAT destination\r\nIsNat = case(NatDestination == \"\", false, true),      NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where\r\n    IsNat == false and\r\n    Action == \"Allow\" and\r\n    Resource =~ \"{Firewall:name}\" and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\n    Protocol, SourceIP,SourcePort,TargetIP,TargetPort, Action //, msg_s",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)\r\n| extend       Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),      Protocol = case(Protocol == \"\", Protocol2, Protocol),      SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),      TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n//ICMP records don't have port information\r\nSourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),  TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n//Regular network rules don't have a DNAT destination\r\nIsNat = case(NatDestination == \"\", false, true),      NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where\r\n    IsNat == false and\r\n    Action == \"Allow\" and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\n    Firewall = Resource,\r\n    Protocol, SourceIP,SourcePort,TargetIP,TargetPort, Action //, msg_s",
         "size": 0,
         "timeContext": {
           "durationMs": 0
         },
         "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "crossComponentResources": [
@@ -361,7 +349,8 @@
                 "customColumnWidthSetting": "11ch"
               }
             }
-          ]
+          ],
+          "filter": true
         }
       },
       "conditionalVisibilities": [
@@ -376,18 +365,19 @@
           "value": "NETALLOW"
         }
       ],
-      "name": "NET-Deny"
+      "name": "NET-Allow"
     },
     {
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)\r\n| extend       Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),      Protocol = case(Protocol == \"\", Protocol2, Protocol),      SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),      TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n//ICMP records don't have port information\r\nSourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),  TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n//Regular network rules don't have a DNAT destination\r\nIsNat = case(NatDestination == \"\", false, true),      NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where\r\n    IsNat == false and\r\n    Action == \"Deny\" and\r\n    Resource =~ \"{Firewall:name}\" and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\n    Protocol, SourceIP,SourcePort,TargetIP,TargetPort, Action //, msg_s",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Network rule log data\r\n// Description: Parses the network rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallNetworkRule\"\r\n//using :int makes it easier to pars but later we'll convert to string as we're not interested to do mathematical functions on these fields\r\n//case 1: for records that look like this:\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny//Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n//case 1a: for regular network rules\r\n//TCP request from 10.0.2.4:51990 to 13.69.65.17:443. Action: Deny/Allow\r\n//UDP request from 10.0.3.4:123 to 51.141.32.51:123. Action: Deny/Allow\r\n| parse msg_s with * \". Action: \" Action1a\r\n//case 1b: for NAT rules\r\n//TCP request from 193.238.46.72:50522 to 40.119.154.83:3389 was DNAT'ed to 10.0.2.4:3389\r\n| parse msg_s with * \" was \" Action1b \" to \" NatDestination\r\n//case 2: for ICMP records\r\n//ICMP request from 10.0.2.4 to 10.0.3.4. Action: Allow\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend  SourcePort = tostring(SourcePortInt),  TargetPort = tostring(TargetPortInt)\r\n| extend       Action = case(Action1a == \"\", case(Action1b == \"\",Action2,Action1b), Action1a),      Protocol = case(Protocol == \"\", Protocol2, Protocol),      SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),      TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),\r\n//ICMP records don't have port information\r\nSourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),  TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort),\r\n//Regular network rules don't have a DNAT destination\r\nIsNat = case(NatDestination == \"\", false, true),      NatDestination = case(NatDestination == \"\", \"N/A\", NatDestination)\r\n| where\r\n    IsNat == false and\r\n    Action == \"Deny\" and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime = datetime_add(\"hour\", 8, TimeGenerated),\r\n    Firewall = Resource,\r\n    Protocol, SourceIP,SourcePort,TargetIP,TargetPort, Action //, msg_s",
         "size": 0,
         "timeContext": {
           "durationMs": 0
         },
         "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "crossComponentResources": [
@@ -410,7 +400,8 @@
                 "customColumnWidthSetting": "11ch"
               }
             }
-          ]
+          ],
+          "filter": true
         }
       },
       "conditionalVisibilities": [
@@ -462,7 +453,7 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "// Author: Microsoft Azure\r\n// Display name: Application rule log data\r\n// Description: Parses the application rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\n\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallApplicationRule\"\r\n//using :int makes it easier to pars but later we'll convert to string \r\n\r\n//as we're not interested to do mathematical functions on these fields\r\n//this first parse statement is valid for all entries as they all start with this format\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" \" TempDetails\r\n//case 1: for records that end with: \"was denied. Reason: SNI TLS extension was missing.\"\r\n| parse TempDetails with \"was \" Action1 \". Reason: \" Rule1\r\n//case 2: for records that end with\r\n//\"to ocsp.digicert.com:80. Action: Allow. Rule Collection: RC1. Rule: Rule1\"\r\n//\"to v10.vortex-win.data.microsoft.com:443. Action: Deny. No rule matched. Proceeding with default action\"\r\n| parse TempDetails with \"to \" FQDN \":\" TargetPortInt:int \". Action: \" Action2 \".\" *\r\n//case 2a: for records that end with:\r\n//\"to ocsp.digicert.com:80. Action: Allow. Rule Collection: RC1. Rule: Rule1\"\r\n| parse TempDetails with * \". Rule Collection: \" RuleCollection2a \". Rule:\" Rule2a\r\n//case 2b: for records that end with:\r\n//for records that end with: \"to v10.vortex-win.data.microsoft.com:443. Action: Deny. No rule matched. Proceeding with default action\"\r\n| parse TempDetails with * \"Deny.\" RuleCollection2b \". Proceeding with\" Rule2b\r\n| extend SourcePort = tostring(SourcePortInt)\r\n|extend TargetPort = tostring(TargetPortInt)\r\n//make sure we only have Allowed / Deny in the Action Field\r\n | extend Action1 = case(Action1 == \"Deny\",\"Deny\",\"Unknown Action\")\r\n| extend Action = case(Action2 == \"\",Action1,Action2),\r\n    Rule = case(Rule2a == \"\",case(Rule1 == \"\",case(Rule2b == \"\",\"N/A\", Rule2b),Rule1),Rule2a), \r\n    RuleCollection = case(RuleCollection2b == \"\",case(RuleCollection2a == \"\",\"No rule matched\",RuleCollection2a),RuleCollection2b),\r\n    FQDN = case(FQDN == \"\", \"N/A\", FQDN),\r\n    TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort)\r\n| where Action == \"Allow\" and\r\nResource =~ \"{Firewall:name}\" and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime =  datetime_add(\"hour\",8, TimeGenerated),\r\n    RuleCollection, Rule, Protocol, SourceIP, SourcePort, FQDN, TargetPort, Action",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Application rule log data\r\n// Description: Parses the application rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\n\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallApplicationRule\"\r\n//using :int makes it easier to pars but later we'll convert to string \r\n\r\n//as we're not interested to do mathematical functions on these fields\r\n//this first parse statement is valid for all entries as they all start with this format\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" \" TempDetails\r\n//case 1: for records that end with: \"was denied. Reason: SNI TLS extension was missing.\"\r\n| parse TempDetails with \"was \" Action1 \". Reason: \" Rule1\r\n//case 2: for records that end with\r\n//\"to ocsp.digicert.com:80. Action: Allow. Rule Collection: RC1. Rule: Rule1\"\r\n//\"to v10.vortex-win.data.microsoft.com:443. Action: Deny. No rule matched. Proceeding with default action\"\r\n| parse TempDetails with \"to \" FQDN \":\" TargetPortInt:int \". Action: \" Action2 \".\" *\r\n//case 2a: for records that end with:\r\n//\"to ocsp.digicert.com:80. Action: Allow. Rule Collection: RC1. Rule: Rule1\"\r\n| parse TempDetails with * \". Rule Collection: \" RuleCollection2a \". Rule:\" Rule2a\r\n//case 2b: for records that end with:\r\n//for records that end with: \"to v10.vortex-win.data.microsoft.com:443. Action: Deny. No rule matched. Proceeding with default action\"\r\n| parse TempDetails with * \"Deny.\" RuleCollection2b \". Proceeding with\" Rule2b\r\n| extend SourcePort = tostring(SourcePortInt)\r\n|extend TargetPort = tostring(TargetPortInt)\r\n//make sure we only have Allowed / Deny in the Action Field\r\n | extend Action1 = case(Action1 == \"Deny\",\"Deny\",\"Unknown Action\")\r\n| extend Action = case(Action2 == \"\",Action1,Action2),\r\n    Rule = case(Rule2a == \"\",case(Rule1 == \"\",case(Rule2b == \"\",\"N/A\", Rule2b),Rule1),Rule2a), \r\n    RuleCollection = case(RuleCollection2b == \"\",case(RuleCollection2a == \"\",\"No rule matched\",RuleCollection2a),RuleCollection2b),\r\n    FQDN = case(FQDN == \"\", \"N/A\", FQDN),\r\n    TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort)\r\n| where Action == \"Allow\" and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime =  datetime_add(\"hour\",8, TimeGenerated),\r\n    Firewall = Resource,\r\n    RuleCollection, Rule, Protocol, SourceIP, SourcePort, FQDN, TargetPort, Action",
         "size": 0,
         "timeContext": {
           "durationMs": 0
@@ -484,6 +475,10 @@
               }
             },
             {
+              "columnMatch": "Firewall",
+              "formatter": 5
+            },
+            {
               "columnMatch": "RuleCollection",
               "formatter": 5
             },
@@ -499,10 +494,11 @@
               }
             }
           ],
+          "filter": true,
           "hierarchySettings": {
             "treeType": 1,
             "groupBy": [
-              "RuleCollection",
+              "Firewall",
               "Rule"
             ],
             "expandTopLevel": true
@@ -521,18 +517,19 @@
           "value": "APPALLOW"
         }
       ],
-      "name": "Step-AppRuleTraffic"
+      "name": "Step-AppAllow"
     },
     {
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "// Author: Microsoft Azure\r\n// Display name: Application rule log data\r\n// Description: Parses the application rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\n\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallApplicationRule\"\r\n//using :int makes it easier to pars but later we'll convert to string \r\n\r\n//as we're not interested to do mathematical functions on these fields\r\n//this first parse statement is valid for all entries as they all start with this format\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" \" TempDetails\r\n//case 1: for records that end with: \"was denied. Reason: SNI TLS extension was missing.\"\r\n| parse TempDetails with \"was \" Action1 \". Reason: \" Rule1\r\n//case 2: for records that end with\r\n//\"to ocsp.digicert.com:80. Action: Allow. Rule Collection: RC1. Rule: Rule1\"\r\n//\"to v10.vortex-win.data.microsoft.com:443. Action: Deny. No rule matched. Proceeding with default action\"\r\n| parse TempDetails with \"to \" FQDN \":\" TargetPortInt:int \". Action: \" Action2 \".\" *\r\n//case 2a: for records that end with:\r\n//\"to ocsp.digicert.com:80. Action: Allow. Rule Collection: RC1. Rule: Rule1\"\r\n| parse TempDetails with * \". Rule Collection: \" RuleCollection2a \". Rule:\" Rule2a\r\n//case 2b: for records that end with:\r\n//for records that end with: \"to v10.vortex-win.data.microsoft.com:443. Action: Deny. No rule matched. Proceeding with default action\"\r\n| parse TempDetails with * \"Deny.\" RuleCollection2b \". Proceeding with\" Rule2b\r\n| extend SourcePort = tostring(SourcePortInt)\r\n|extend TargetPort = tostring(TargetPortInt)\r\n//make sure we only have Allowed / Deny in the Action Field\r\n | extend Action1 = case(Action1 == \"Deny\",\"Deny\",\"Unknown Action\")\r\n| extend Action = case(Action2 == \"\",Action1,Action2),\r\n    Rule = case(Rule2a == \"\",case(Rule1 == \"\",case(Rule2b == \"\",\"N/A\", Rule2b),Rule1),Rule2a), \r\n    RuleCollection = case(RuleCollection2b == \"\",case(RuleCollection2a == \"\",\"No rule matched\",RuleCollection2a),RuleCollection2b),\r\n    FQDN = case(FQDN == \"\", \"N/A\", FQDN),\r\n    TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort)\r\n| where Action == \"Deny\" and\r\nResource =~ \"{Firewall:name}\" and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime =  datetime_add(\"hour\",8, TimeGenerated),\r\n    RuleCollection, Rule, Protocol, SourceIP, SourcePort, FQDN, TargetPort, Action",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Application rule log data\r\n// Description: Parses the application rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\n\r\nAzureDiagnostics\r\n| where Category == \"AzureFirewallApplicationRule\"\r\n//using :int makes it easier to pars but later we'll convert to string \r\n\r\n//as we're not interested to do mathematical functions on these fields\r\n//this first parse statement is valid for all entries as they all start with this format\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" \" TempDetails\r\n//case 1: for records that end with: \"was denied. Reason: SNI TLS extension was missing.\"\r\n| parse TempDetails with \"was \" Action1 \". Reason: \" Rule1\r\n//case 2: for records that end with\r\n//\"to ocsp.digicert.com:80. Action: Allow. Rule Collection: RC1. Rule: Rule1\"\r\n//\"to v10.vortex-win.data.microsoft.com:443. Action: Deny. No rule matched. Proceeding with default action\"\r\n| parse TempDetails with \"to \" FQDN \":\" TargetPortInt:int \". Action: \" Action2 \".\" *\r\n//case 2a: for records that end with:\r\n//\"to ocsp.digicert.com:80. Action: Allow. Rule Collection: RC1. Rule: Rule1\"\r\n| parse TempDetails with * \". Rule Collection: \" RuleCollection2a \". Rule:\" Rule2a\r\n//case 2b: for records that end with:\r\n//for records that end with: \"to v10.vortex-win.data.microsoft.com:443. Action: Deny. No rule matched. Proceeding with default action\"\r\n| parse TempDetails with * \"Deny.\" RuleCollection2b \". Proceeding with\" Rule2b\r\n| extend SourcePort = tostring(SourcePortInt)\r\n|extend TargetPort = tostring(TargetPortInt)\r\n//make sure we only have Allowed / Deny in the Action Field\r\n | extend Action1 = case(Action1 == \"Deny\",\"Deny\",\"Unknown Action\")\r\n| extend Action = case(Action2 == \"\",Action1,Action2),\r\n    Rule = case(Rule2a == \"\",case(Rule1 == \"\",case(Rule2b == \"\",\"N/A\", Rule2b),Rule1),Rule2a), \r\n    RuleCollection = case(RuleCollection2b == \"\",case(RuleCollection2a == \"\",\"No rule matched\",RuleCollection2a),RuleCollection2b),\r\n    FQDN = case(FQDN == \"\", \"N/A\", FQDN),\r\n    TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort)\r\n| where Action == \"Deny\" and\r\n    TimeGenerated {TimeRange}\r\n| project\r\n    DateTime =  datetime_add(\"hour\",8, TimeGenerated),\r\n    Firewall = Resource,\r\n    RuleCollection, Rule, Protocol, SourceIP, SourcePort, FQDN, TargetPort, Action",
         "size": 0,
         "timeContext": {
           "durationMs": 0
         },
         "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "crossComponentResources": [
@@ -547,6 +544,10 @@
               "formatOptions": {
                 "customColumnWidthSetting": "27ch"
               }
+            },
+            {
+              "columnMatch": "Firewall",
+              "formatter": 5
             },
             {
               "columnMatch": "RuleCollection",
@@ -564,10 +565,11 @@
               }
             }
           ],
+          "filter": true,
           "hierarchySettings": {
             "treeType": 1,
             "groupBy": [
-              "RuleCollection",
+              "Firewall",
               "Rule"
             ],
             "expandTopLevel": true
@@ -592,12 +594,13 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "// Author: Microsoft Azure\r\n// Display name: Threat Intelligence rule log data\r\n// Description: Parses the Threat Intelligence rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\n\r\nAzureDiagnostics\r\n| where OperationName  == \"AzureFirewallThreatIntelLog\"\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n| parse msg_s with * \". Action: \" Action \".\" Message\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend SourcePort = tostring(SourcePortInt),TargetPort = tostring(TargetPortInt)\r\n| extend Protocol = case(Protocol == \"\", Protocol2, Protocol),SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),SourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort)\r\n| sort by TimeGenerated desc \r\n\r\n| project TimeGenerated, msg_s, Protocol, SourceIP,SourcePort,TargetIP,TargetPort,Action,Message",
+        "query": "// Author: Microsoft Azure\r\n// Display name: Threat Intelligence rule log data\r\n// Description: Parses the Threat Intelligence rule log data.\r\n// Categories: Network,Security\r\n// Resource types: Firewalls\r\n// Topic: Firewall Logs\r\nAzureDiagnostics\r\n| where OperationName  == \"AzureFirewallThreatIntelLog\"\r\n| parse msg_s with Protocol \" request from \" SourceIP \":\" SourcePortInt:int \" to \" TargetIP \":\" TargetPortInt:int *\r\n| parse msg_s with * \". Action: \" Action \". ThreatIntel: \" Message\r\n| parse msg_s with Protocol2 \" request from \" SourceIP2 \" to \" TargetIP2 \". Action: \" Action2\r\n| extend SourcePort = tostring(SourcePortInt),TargetPort = tostring(TargetPortInt)\r\n| extend Protocol = case(Protocol == \"\", Protocol2, Protocol),SourceIP = case(SourceIP == \"\", SourceIP2, SourceIP),TargetIP = case(TargetIP == \"\", TargetIP2, TargetIP),SourcePort = case(SourcePort == \"\", \"N/A\", SourcePort),TargetPort = case(TargetPort == \"\", \"N/A\", TargetPort)\r\n| sort by TimeGenerated desc\r\n| project\r\n    DateTime =  datetime_add(\"hour\",8, TimeGenerated),\r\n    Message, Action, Resource, Protocol, SourceIP,SourcePort,TargetIP,TargetPort",
         "size": 0,
         "timeContext": {
           "durationMs": 0
         },
         "timeContextFromParameter": "TimeRange",
+        "showExportToExcel": true,
         "queryType": 0,
         "resourceType": "microsoft.operationalinsights/workspaces",
         "crossComponentResources": [
@@ -605,38 +608,7 @@
         ],
         "visualization": "table",
         "gridSettings": {
-          "formatters": [
-            {
-              "columnMatch": "DateTime",
-              "formatter": 6,
-              "formatOptions": {
-                "customColumnWidthSetting": "27ch"
-              }
-            },
-            {
-              "columnMatch": "RuleCollection",
-              "formatter": 5
-            },
-            {
-              "columnMatch": "Rule",
-              "formatter": 5
-            },
-            {
-              "columnMatch": "Protocol",
-              "formatter": 0,
-              "formatOptions": {
-                "customColumnWidthSetting": "11ch"
-              }
-            }
-          ],
-          "hierarchySettings": {
-            "treeType": 1,
-            "groupBy": [
-              "RuleCollection",
-              "Rule"
-            ],
-            "expandTopLevel": true
-          }
+          "filter": true
         }
       },
       "conditionalVisibility": {
@@ -644,7 +616,7 @@
         "comparison": "isEqualTo",
         "value": "THREAT"
       },
-      "name": "Step-AppRuleTraffic - Copy - Copy"
+      "name": "query - 11"
     }
   ],
   "fallbackResourceIds": [

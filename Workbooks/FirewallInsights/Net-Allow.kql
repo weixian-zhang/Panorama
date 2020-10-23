@@ -31,8 +31,8 @@ IsNat = case(NatDestination == "", false, true),      NatDestination = case(NatD
 | where
     IsNat == false and
     Action == "Allow" and
-    Resource =~ "{Firewall:name}" and
     TimeGenerated {TimeRange}
 | project
     DateTime = datetime_add("hour", 8, TimeGenerated),
+    Firewall = Resource,
     Protocol, SourceIP,SourcePort,TargetIP,TargetPort, Action //, msg_s

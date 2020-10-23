@@ -30,8 +30,9 @@ SourcePort = case(SourcePort == "", "N/A", SourcePort),  TargetPort = case(Targe
 IsNat = case(NatDestination == "", false, true),      NatDestination = case(NatDestination == "", "N/A", NatDestination)
 | where
     IsNat == true and
-    Resource =~ "{Firewall:name}" and
     TimeGenerated {TimeRange}
-| project       DateTime = datetime_add("hour", 8, TimeGenerated),
+| project
+    DateTime = datetime_add("hour", 8, TimeGenerated),
+    Firewall = Resource,
 Protocol, SourceIP,SourcePort,TargetIP,TargetPort, NatDestination
 //, Action, msg_s

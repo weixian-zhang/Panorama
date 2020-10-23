@@ -1,0 +1,3 @@
+AzureDiagnostics
+| where OperationName  == "AzureFirewallThreatIntelLog"
+| make-series ThreatCount=count() on TimeGenerated from ago(90d) to now() step 1hour
