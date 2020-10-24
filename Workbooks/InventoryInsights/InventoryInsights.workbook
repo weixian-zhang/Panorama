@@ -1,0 +1,121 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "761d2112-1ce5-42f7-92ed-512bdefd6840",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "value": [
+              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352",
+              "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "includeAll": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1"
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 1"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "",
+        "size": 1,
+        "title": "All Resource Details",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "{Subscription}"
+        ]
+      },
+      "name": "query - 0 - Copy"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Resources\r\n| where type=='microsoft.network/virtualnetworks'\r\n| extend Subnets = parse_json(properties).subnets\r\n| extend RscIdSplit = split(id, \"/\")\r\n| extend SubscriptionId =  tostring(RscIdSplit[2])\r\n| join kind=inner\r\n\t\t(ResourceContainers \r\n\t\t | where type == \"microsoft.resources/subscriptions\"\r\n\t\t | project SubscriptionName = name, subscriptionId\r\n\t\t) on $left.SubscriptionId == $right.subscriptionId\r\n| mvexpand Subnets\r\n| where isnull(Subnets.properties.networkSecurityGroup)\r\n| project SubscriptionName, ResourceGroup=resourceGroup, VNet = name, SubnetName = Subnets.name ",
+        "size": 1,
+        "title": "Subnets without NSG",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "{Subscription}"
+        ]
+      },
+      "name": "query - 0"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "",
+        "size": 1,
+        "title": "VM with Public IPs",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "{Subscription}"
+        ]
+      },
+      "name": "query - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "",
+        "size": 1,
+        "title": "Load Balancers with Public IPs",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "{Subscription}"
+        ]
+      },
+      "name": "query - 2 - Copy"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "",
+        "size": 1,
+        "title": "Application Gateways with Public IPs",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "{Subscription}"
+        ]
+      },
+      "name": "query - 2 - Copy - Copy"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
