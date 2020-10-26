@@ -1,0 +1,2 @@
+Resources
+| summarize ["Resource Count"] = count() by Location=location

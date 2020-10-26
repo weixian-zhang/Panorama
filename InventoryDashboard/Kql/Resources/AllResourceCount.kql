@@ -1,0 +1,1 @@
+count | project ["All Resource count"]=Count

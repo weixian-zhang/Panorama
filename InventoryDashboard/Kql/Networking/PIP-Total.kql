@@ -1,0 +1,3 @@
+Resources
+| where type == "microsoft.network/publicipaddresses"
+| summarize ["Public IPs"] = count()

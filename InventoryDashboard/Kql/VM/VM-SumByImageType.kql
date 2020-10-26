@@ -1,0 +1,7 @@
+Resources
+| where type == "microsoft.compute/virtualmachines"
+| extend
+	imgOffer = properties.storageProfile.imageReference.offer,
+	imgSku = properties.storageProfile.imageReference.sku
+| summarize ["Image Count"] =count() by tostring(imgOffer), tostring(imgSku)
+| project Image = strcat(tostring(imgOffer)," | ", tostring(imgSku)), ["Image Count"]

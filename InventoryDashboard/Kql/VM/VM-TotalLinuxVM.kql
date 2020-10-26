@@ -1,0 +1,5 @@
+Resources
+| extend OS = properties.storageProfile.osDisk.osType
+| where type == "microsoft.compute/virtualmachines" and 
+		OS == "Linux"
+| summarize ["Linux VM"] = count()

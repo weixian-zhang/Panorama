@@ -1,0 +1,3 @@
+Resources
+| where type == "microsoft.compute/virtualmachines"
+| summarize ["Total VMs"] = count()

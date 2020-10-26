@@ -1,0 +1,5 @@
+Resources
+| extend tempType = split(type, "/")
+| extend FormattedType = strcat(tempType[0], "/", toupper(tempType[1]))
+| summarize RT = count() by FormattedType
+| project ["Resource Type"] = FormattedType, Count = RT

@@ -1,0 +1,8 @@
+Resources
+| extend Props = properties
+| where type == "microsoft.network/publicipaddresses" and 
+		isnull(Props.ipConfiguration)
+| project
+	["ResourceGroup"] = resourceGroup,
+	Name=name
+

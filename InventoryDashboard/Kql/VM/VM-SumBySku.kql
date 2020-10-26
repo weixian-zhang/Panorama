@@ -1,0 +1,4 @@
+Resources
+| where type == "microsoft.compute/virtualmachines"
+| extend VMSku = parse_json(properties.hardwareProfile).vmSize
+| summarize ["SKU Count"]=count() by tostring(VMSku)

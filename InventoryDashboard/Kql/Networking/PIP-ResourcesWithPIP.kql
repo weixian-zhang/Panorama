@@ -1,0 +1,17 @@
+Resources
+| extend Props = properties
+| extend IPConfig = tostring(Props.ipConfiguration.id)
+| extend PIPSku = parse_json(sku).name
+| extend IPConfigRsc = split(IPConfig, "/")
+| extend SplittedArrLength = array_length(IPConfigRsc)
+| extend AttachedResourceType = strcat(IPConfigRsc[(SplittedArrLength-5)],"/", IPConfigRsc[(SplittedArrLength-4)])
+| extend AttachedResource = IPConfigRsc[(SplittedArrLength - 1)]
+| where type == "microsoft.network/publicipaddresses" and 
+		isnotnull(IPConfig)
+| project
+	["ResourceGroup"] = resourceGroup,
+	Name=name, 
+	IP=properties.ipAddress, 
+	["Attached Resource Type"]=AttachedResourceType, 
+	["Attached Resource"]=AttachedResource
+
