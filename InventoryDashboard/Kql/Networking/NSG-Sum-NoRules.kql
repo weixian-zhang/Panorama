@@ -1,0 +1,6 @@
+Resources
+| extend Rules  = parse_json(properties.securityRules)
+| where
+	type == "microsoft.network/networksecuritygroups" and 
+	array_length(Rules) == 0
+| summarize ["NSG Empty Rules"] = count()

@@ -1,0 +1,23 @@
+Resources
+| extend SecurityRules  = parse_json(properties.securityRules)
+| extend Rules = SecurityRules
+| mvexpand Rules
+| extend Direction = Rules.properties.direction
+| extend OutDestAddrPrefixes = parse_json(Rules.properties.destinationAddressPrefixes)
+| extend OutDestAddrPrefix = Rules.properties.destinationAddressPrefix
+| where
+	type == "microsoft.network/networksecuritygroups" and
+	array_length(SecurityRules) > 0 and 
+	Direction == "Outbound" and 
+	( OutDestAddrPrefixes in~ ("any", "*", "0.0.0.0/0") or OutDestAddrPrefix in~ ("any", "*", "0.0.0.0/0") )
+| distinct resourceGroup, name, 
+	tostring(Rules.name),
+	tostring(Rules.properties.priority),
+	tostring(Rules.properties.access),
+	tostring(Rules.properties.protocol),
+	tostring(Rules.properties.sourceAddressPrefix),
+	tostring(Rules.properties.sourceAddressPrefixes),
+	tostring(Rules.properties.destinationAddressPrefix),
+	tostring(Rules.properties.destinationAddressPrefixes),
+	tostring(Rules.properties.destinationPortRange),
+	tostring(Rules.properties.destinationPortRanges)

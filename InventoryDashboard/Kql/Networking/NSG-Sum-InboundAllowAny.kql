@@ -1,0 +1,13 @@
+Resources
+| extend SecurityRules  = parse_json(properties.securityRules)
+| extend Rules = SecurityRules
+| mvexpand Rules
+| extend Direction = Rules.properties.direction
+| extend InSrcAddrPrefixes = parse_json(Rules.properties.sourceAddressPrefixes)
+| extend InSrcAddrPrefix = Rules.properties.sourceAddressPrefix
+| where
+	type == "microsoft.network/networksecuritygroups" and
+	array_length(SecurityRules) > 0 and 
+	Direction == "Inbound" and 
+	( InSrcAddrPrefixes in~ ("any", "*", "0.0.0.0/0") or InSrcAddrPrefix in~ ("any", "*", "0.0.0.0/0") )
+| summarize ["NSG allow Inbound Any"] = dcount(type)

@@ -1,0 +1,3 @@
+Resources
+| where type == "microsoft.network/virtualnetworks"
+| summarize VNets = count()

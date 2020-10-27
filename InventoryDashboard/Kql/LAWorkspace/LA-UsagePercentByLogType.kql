@@ -1,0 +1,6 @@
+Usage
+| where TimeGenerated > startofday(ago(90d))
+| where IsBillable == true
+| summarize IngestedGB = sum(Quantity) / 1000 by Solution
+| sort by IngestedGB desc
+| render piechart
