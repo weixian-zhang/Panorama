@@ -1,0 +1,7 @@
+//Author: Vishwanath
+//https://medium.com/microsoftazure/azure-monitor-for-containers-optimizing-data-collection-settings-for-cost-ce6f848aca32
+
+ContainerLog
+| where TimeGenerated {TimeRange}
+| where _IsBillable == true
+| summarize BillableDataMBytes = round(((sum(_BilledSize) / 1000) / 1000), 2) by LogEntrySource

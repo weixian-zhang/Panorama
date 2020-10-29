@@ -1,0 +1,6 @@
+//Author: Vishwanath
+//https://medium.com/microsoftazure/azure-monitor-for-containers-optimizing-data-collection-settings-for-cost-ce6f848aca32
+
+ContainerInventory
+| where TimeGenerated > ago(1h)
+| summarize envvarsMB = round(sum(string_size(EnvironmentVar)) / (1000. * 1000.), 2)

@@ -1,0 +1,221 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "parameters": [
+          {
+            "id": "761d2112-1ce5-42f7-92ed-512bdefd6840",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "value": [
+              "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352",
+              "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "includeAll": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1"
+          },
+          {
+            "id": "3e49b72e-f4d8-42db-bd28-9bd0c1046ea6",
+            "version": "KqlParameterItem/1.0",
+            "name": "Workspace",
+            "type": 5,
+            "isRequired": true,
+            "query": "where type =~ 'microsoft.operationalinsights/workspaces'\r\n| order by name asc\r\n| project value = id, label = id",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352/resourceGroups/CH-OpsRG-Pri/providers/Microsoft.OperationalInsights/workspaces/CH-LA",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1"
+              ],
+              "showDefault": false
+            },
+            "defaultValue": "value::1",
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "04055d6a-af8e-4200-9db9-d8967966b6d8",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time Range",
+            "type": 4,
+            "isRequired": true,
+            "value": {
+              "durationMs": 604800000
+            },
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ],
+              "allowCustom": true
+            }
+          },
+          {
+            "id": "be4d00c6-f36c-4342-815d-544c07b25091",
+            "version": "KqlParameterItem/1.0",
+            "name": "ContainerInsightsContainerInventoryMb",
+            "type": 1,
+            "query": "ContainerInventory\r\n| where TimeGenerated > ago(1h)\r\n| summarize envvarsMB = round(sum(string_size(EnvironmentVar)) / (1000. * 1000.), 2)",
+            "crossComponentResources": [
+              "{Workspace}"
+            ],
+            "isHiddenWhenLocked": true,
+            "timeContext": {
+              "durationMs": 0
+            },
+            "timeContextFromParameter": "TimeRange",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces"
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 1"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Usage\r\n| where TimeGenerated {TimeRange}\r\n| where IsBillable == true\r\n| summarize IngestedGB = round((sum(Quantity) / 1000),2) by Solution\r\n| sort by IngestedGB desc",
+        "size": 0,
+        "title": "Log Ingestion By Solution (GB)",
+        "noDataMessage": "No ContainerInsights logs found",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "piechart"
+      },
+      "customWidth": "50",
+      "name": "query - 0"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ContainerLog\r\n| where TimeGenerated {TimeRange}\r\n| where _IsBillable == true\r\n| summarize BillableDataMBytes = round(((sum(_BilledSize) / 1000) / 1000), 2) by LogEntrySource",
+        "size": 0,
+        "title": "Kubernetes - ContainerInsights Logs (MB)",
+        "noDataMessage": "No ContainerInsights logs found",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "piechart"
+      },
+      "customWidth": "50",
+      "name": "query - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let containerLogs = ContainerLog\r\n| where TimeGenerated {TimeRange}\r\n| where _IsBillable == true\r\n| summarize BillableDataMBytes = sum(_BilledSize)/ (1000. * 1000.) by LogEntrySource, ContainerID;\r\nlet kpi = KubePodInventory\r\n| where TimeGenerated {TimeRange}\r\n| distinct ContainerID, Namespace;\r\ncontainerLogs\r\n| join kpi on $left.ContainerID == $right.ContainerID\r\n| extend sourceNamespace = strcat(LogEntrySource, \"/\", Namespace)\r\n| summarize MB=sum(BillableDataMBytes) by sourceNamespace\r\n| render piechart",
+        "size": 0,
+        "title": "Kubernetes - ContainerInsights Log By Namespace (MB)",
+        "noDataMessage": "No ContainerInsights logs found",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ]
+      },
+      "customWidth": "50",
+      "name": "query - 3"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "#### Kubernetes - ContainerInsights - Env Variable Logs  \r\n\r\n#### {ContainerInsightsContainerInventoryMb} MB"
+      },
+      "customWidth": "50",
+      "name": "text - 5"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

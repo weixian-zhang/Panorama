@@ -1,0 +1,8 @@
+//Author: Vishwanath
+//https://medium.com/microsoftazure/azure-monitor-for-containers-optimizing-data-collection-settings-for-cost-ce6f848aca32
+
+Usage
+| where TimeGenerated {TimeRange}
+| where IsBillable == true
+| summarize IngestedGB = round((sum(Quantity) / 1000),2) by Solution
+| sort by IngestedGB desc
