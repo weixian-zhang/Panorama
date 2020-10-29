@@ -1,4 +1,4 @@
 Resources
 | extend PowerState = properties.extended.instanceView.powerState.displayStatus
 | where type == "microsoft.compute/virtualmachines" and PowerState == "VM running"
-| project ["Resource Group"] = resourceGroup, Name=name, State="Running"
+| summarize Count = count()

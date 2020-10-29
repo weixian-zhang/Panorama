@@ -1,0 +1,15 @@
+Resources
+| where type=='microsoft.network/virtualnetworks'
+| extend Subnets = parse_json(properties).subnets
+| extend RscIdSplit = split(id, "/")
+| extend SubscriptionId =  tostring(RscIdSplit[2])
+| join kind=inner
+	(ResourceContainers
+		| extend SubscriptionName = name
+		| where type == "microsoft.resources/subscriptions"
+	) on $left.SubscriptionId == $right.subscriptionId
+| mvexpand Subnets
+| extend NSGRscId = parse_json(Subnets.properties.networkSecurityGroup).id
+| extend NSGRscIdSplitArrLen = array_length(split(NSGRscId, "/"))
+| extend NSGName = iif(NSGRscIdSplitArrLen == 0, "", split(NSGRscId, "/")[(NSGRscIdSplitArrLen - 1)])
+| project SubscriptionName, ResourceGroup = resourceGroup, VNet = name, Subnet = tostring(Subnets.name), NSGName

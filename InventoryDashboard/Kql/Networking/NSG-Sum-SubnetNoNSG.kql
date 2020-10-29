@@ -1,0 +1,10 @@
+Resources
+| where type=='microsoft.network/virtualnetworks'
+| extend Subnets = parse_json(properties).subnets
+| extend RscIdSplit = split(id, "/")
+| extend SubscriptionId =  tostring(RscIdSplit[2])
+
+| mvexpand Subnets
+| where isnull(Subnets.properties.networkSecurityGroup) and
+	Subnets.name !in~ ("AzureFirewallSubnet", "GateWaySubnet")
+| summarize Count=dcount(tostring(Subnets.name)) by ResourceGroup = resourceGroup, VNet = name

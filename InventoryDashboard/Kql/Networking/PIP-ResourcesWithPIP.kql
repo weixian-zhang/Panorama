@@ -2,16 +2,14 @@ Resources
 | extend Props = properties
 | extend IPConfig = tostring(Props.ipConfiguration.id)
 | extend PIPSku = parse_json(sku).name
-| extend IPConfigRsc = split(IPConfig, "/")
+| extend IPConfigRsc = split(IPConfig, "/*/")
 | extend SplittedArrLength = array_length(IPConfigRsc)
-| extend AttachedResourceType = strcat(IPConfigRsc[(SplittedArrLength-5)],"/", IPConfigRsc[(SplittedArrLength-4)])
-| extend AttachedResource = IPConfigRsc[(SplittedArrLength - 1)]
+| parse IPConfig with * "/Microsoft." ResourceProvider "/" ResourceType "/" Resource
 | where type == "microsoft.network/publicipaddresses" and 
-		isnotnull(IPConfig)
+		isnotnull(Props.ipConfiguration)
 | project
 	["ResourceGroup"] = resourceGroup,
-	Name=name, 
-	IP=properties.ipAddress, 
-	["Attached Resource Type"]=AttachedResourceType, 
-	["Attached Resource"]=AttachedResource
-
+	["Resource Type"]=ResourceType, 
+	["Resource"]=Resource,
+	["PIP Name"]=name, 
+	["PIP"]=properties.ipAddress

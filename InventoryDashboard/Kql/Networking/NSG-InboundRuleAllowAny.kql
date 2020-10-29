@@ -3,8 +3,8 @@ Resources
 | extend Rules = SecurityRules
 | mvexpand Rules
 | extend Direction = Rules.properties.direction
-| extend OutDestAddrPrefixes = parse_json(Rules.properties.destinationAddressPrefixes)
-| extend OutDestAddrPrefix = Rules.properties.destinationAddressPrefix
+| extend InSrcAddrPrefixes = parse_json(Rules.properties.sourceAddressPrefixes)
+| extend InSrcAddrPrefix = Rules.properties.sourceAddressPrefix
 | extend RuleName = tostring(Rules.name)
 | extend Priority = tostring(Rules.properties.priority)
 | extend Access = tostring(Rules.properties.access)
@@ -27,8 +27,8 @@ iif(array_length(Rules.properties.destinationPortRanges) == 0, "", strcat_array(
 	type == "microsoft.network/networksecuritygroups" and
 	array_length(SecurityRules) > 0 and 
 	Access =~ "Allow" and
-	Direction == "Outbound" and 
-	( OutDestAddrPrefixes in~ ("any", "*", "0.0.0.0/0") or OutDestAddrPrefix in~ ("any", "*", "0.0.0.0/0") )
+	Direction == "Inbound" and 
+	( InSrcAddrPrefixes in~ ("any", "*", "0.0.0.0/0") or InSrcAddrPrefix in~ ("any", "*", "0.0.0.0/0") )
 | distinct 
 	resourceGroup, name, 
 	RuleName,
