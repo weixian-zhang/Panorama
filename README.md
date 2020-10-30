@@ -25,7 +25,7 @@ Panorama consists of the following artifacts:
 3. Follow by clicking Code icon "</>"  
 4. Under **Gallery Template**, delete existing Json and paste in IaaSInsights Workbook Json content and hit "Apply"
    <img src="./docs/setup-workbook-1.png" width="450" height="250" align="left" />  
-   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
@@ -41,12 +41,12 @@ Panorama consists of the following artifacts:
 This workbook contains 5 tabs:  
 * VM Availability: A simple graph view of Azure Health metrics. Green means VM is available, Orange can means stopped or not available for whatever reasons.
 * CPU & Memory: This gives you the details of each VM what is the current CPU consupmtion in % and the number of cores. For memory, it shows the Available Memory out of Total Memory of the VM spec.
-* Disk Capacity: Breaks down all drives hold by each VM and the free space. Any disk lesser 15GB of free space will be marked Red.
-* Patch Status: This tab gives you a <em>Grid Summary and Detail</em> view where you can select a VM and table below shows you which patches are missing.  
+* Disk Capacity: Breaks down all drives attached to each VM and shows the free space in each drive. ([D drive](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/change-drive-letter) is a temp drive). Any disk lesser 15GB of free space will be marked Red.
+* Patch Status: This tab gives you a <em>Grid Summary and Detail</em> view where you can select a VM in the Summary Table while the Details Table below shows you which patches are missing.  
 * Change Tracking: Showcase 5 areas of changes: File, Windows Services, Linux Daemons, Software and Registry
 
 ### Firewall Insights Workbook  
-This workbook categorizes traffics that are processed by your Azure Firewall into 4 tabs filtered views of: Threat Intelligence, NAT, Network and Application FQDNs  
+This workbook categorizes traffics that are processed by Azure Firewall into 4 tabs filtered views of: Threat Intelligence, NAT, Network and Application FQDNs  
 
 ### Log Analytics Insights Workbook  
 It operates 1 workspace at a time, contains a view of ingested logs in GB grouped by Monitoring Solution, and Kubernetes specific logs collection by enabling ContainerInsignts.  
