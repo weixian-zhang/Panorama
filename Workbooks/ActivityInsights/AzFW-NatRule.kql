@@ -26,7 +26,7 @@ AzureActivity
     CorrelationId == "{CorrelationId}" and 
     _ResourceId == "{ResourceId}" and
     CategoryValue  == "Administrative" and
-    ActivityStatusValue == "Started" //and //select only 1 entry of the same activity
+    ActivityStatusValue == "Started" //select only 1 entry of the same activity
 
 | project
     CollectionName,
