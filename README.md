@@ -51,7 +51,7 @@ This workbook categorizes traffics that are processed by Azure Firewall into 4 t
 ### Log Analytics Insights Workbook  
 It operates 1 workspace at a time, contains a view of ingested logs in GB grouped by Monitoring Solution, and Kubernetes specific logs collection by enabling ContainerInsignts.  
 ### Inventory Dashboard
-It contains 3 general categories:  
+It contains 3 general categories:
 * All Resources
 * Virtual Machines: Number of Linux and Windows VMs and which VMs are running and which are not. Pie charts of VM grouped by Image Type and by VM SKU.
 * Networking: All Virtual Networks and Subnets
