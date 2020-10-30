@@ -12,10 +12,10 @@
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
 * Workbooks  
-   * [Activity Insights](*activity-insights-workbook)
-   * [IaaS Insights](*iaaS-insights-workbook)
-   * [Firewall Insights](*firewall-insights-workbook)
-   * [LogAnalytics Insights](*log-analytics-insights-workbook)
+   * [Activity Insights](#activity-insights-workbook)
+   * [IaaS Insights](#iaaS-insights-workbook)
+   * [Firewall Insights](#firewall-insights-workbook)
+   * [LogAnalytics Insights](#log-analytics-insights-workbook)
 * Dashboard
    * [Inventory Dashboard](*inventory-dashboard)
 
