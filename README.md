@@ -21,9 +21,9 @@ Panorama consists of the following artifacts:
 
 ### Setup a Workbook
 1. Copy Json content of any Panorama Workbook for example [IaaSInsights](https://github.com/weixian-zhang/Panorama/blob/master/Workbooks/IaaSInsights/IaaSInsights.workbook),  
-2. In Azure Portal, go to **Monitor** and click on Workbook, click **Empty Workbook**  
-3. Follow by clicking on Code icon "</>"  
-4. Under Gallery Template, delete existing Json and paste in IaaSInsights Workbook Json content and hit "Apply"
+2. In Azure Portal, go to **Monitor** and click on Workbook, select **Empty Workbook**  
+3. Follow by clicking Code icon "</>"  
+4. Under **Gallery Template**, delete existing Json and paste in IaaSInsights Workbook Json content and hit "Apply"
    <img src="./docs/setup-workbook-1.png" width="450" height="250" align="left" />  
    <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
