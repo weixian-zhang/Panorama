@@ -53,8 +53,10 @@ It contains 3 general categories:
 * All Resources
 * Virtual Machines: Number of Linux and Windows VMs and which VMs are running and which are not. Pie charts of VM grouped by Image Type and by VM SKU.
 * Networking: All Virtual Networks and Subnets
-  * Networking - NSG: whistleblowing about which NSG has no rules,  
+  * Networking - NSG: whistleblowing which NSG has no rules,  
   Subnets with no NSG (excluding AzureFirewallSubnet and GatewaySubnet)  
-  which Inbound and/or Outbound rules has destination address * | Any | 0.0.0.0/0
+  and which Inbound and/or Outbound rules has destination address * | Any | 0.0.0.0/0  
+  
+  * Networking - Public IP: Shows all resources with Public IPs and Public IPs not assiciated to any resource.
 
 
