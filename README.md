@@ -17,7 +17,7 @@ Panorama consists of the following artifacts:
    * [Firewall Insights](#firewall-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
 * Dashboard
-   * [Inventory Dashboard](*inventory-dashboard)
+   * [Inventory Dashboard](#inventory-dashboard)
 
 ### Setup a Workbook
 1. Copy Json content of any Panorama Workbook for example [IaaSInsights](https://github.com/weixian-zhang/Panorama/blob/master/Workbooks/IaaSInsights/IaaSInsights.workbook),  
