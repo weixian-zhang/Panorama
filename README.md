@@ -30,7 +30,7 @@ Panorama consists of the following artifacts:
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
 2. Upload .json dashboard.  
-   <img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Activity Insights Workbook    
 * all general resource writes and deletes of your Azure environment
