@@ -1,6 +1,8 @@
-<p>
-  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, resource performance, capacity and security
-</p>
+
+  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, resource performance, capacity and security.  
+  This project is inspired by [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity) repo, but with more focus on security monitoring.  
+  The workbooks does not currently contain Location filtering due to the workbooks are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
+  But Location paramater can be easily added.
 
 ### Content
 * [Workbooks & Dasboard](#workbooks-and-dasboard)
@@ -40,5 +42,8 @@ This workbook contains 5 tabs:
 * VM Availability: A simple graph view of Azure Health metrics. Green means VM is available, Orange can means stopped or not available for whatever reasons.
 * CPU & Memory: This gives you the details of each VM what is the current CPU consupmtion in % and the number of cores. For memory, it shows the Available Memory out of Total Memory of the VM spec.
 * Disk Capacity: Breaks down all drives hold by each VM and the free space. Any disk lesser 15GB of free space will be marked Red.
-*  Patch Status: This tab gives you a <em>Grid Summary and Detail</em> view where you can select a VM and table below shows you which patches are missing.
+*  Patch Status: This tab gives you a <em>Grid Summary and Detail</em> view where you can select a VM and table below shows you which patches are missing.  
+
+### Firewall Insights Workbook  
+This workbook categorizes traffics that are processed by your Azure Firewall into 4 tabs filtered views of: Threat Intelligence, NAT, Network and Application FQDNs
 
