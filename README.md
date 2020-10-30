@@ -1,6 +1,6 @@
 
-  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, resource performance, capacity and security. This project is inspired by [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity) repo, but with more focus on security monitoring.  
-  The workbooks does not currently contain Location filtering due to the workbooks are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
+  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, resource performance, capacity and security. This project is inspired by [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity), but with more focus on security monitoring.  
+  The workbooks does not currently contain Location filtering as they are built for the purpose of, a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
   But Location paramater can be easily added.
 
 ### Content
