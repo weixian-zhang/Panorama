@@ -28,7 +28,7 @@ Under Gallery Template, delete existing Json and paste in IaaSInsights Workbook 
 ### Setup a Dashboard  
 Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
 Upload .json dashboard.  
-<img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Activity Insights Workbook    
 * all general resource writes and deletes of your Azure environment
@@ -44,5 +44,17 @@ This workbook contains 5 tabs:
 *  Patch Status: This tab gives you a <em>Grid Summary and Detail</em> view where you can select a VM and table below shows you which patches are missing.  
 
 ### Firewall Insights Workbook  
-This workbook categorizes traffics that are processed by your Azure Firewall into 4 tabs filtered views of: Threat Intelligence, NAT, Network and Application FQDNs
+This workbook categorizes traffics that are processed by your Azure Firewall into 4 tabs filtered views of: Threat Intelligence, NAT, Network and Application FQDNs  
+
+### Log Analytics Insights Workbook  
+It operates 1 workspace at a time, contains a view of ingested logs in GB grouped by Monitoring Solution, and Kubernetes specific logs collection by enabling ContainerInsignts.  
+### Inventory Dashboard
+It contains 3 general categories:  
+* All Resources
+* Virtual Machines: Number of Linux and Windows VMs and which VMs are running and which are not. Pie charts of VM grouped by Image Type and by VM SKU.
+* Networking: All Virtual Networks and Subnets
+  * Networking - NSG: whistleblowing about which NSG has no rules,  
+  Subnets with no NSG (excluding AzureFirewallSubnet and GatewaySubnet)  
+  which Inbound and/or Outbound rules has destination address * | Any | 0.0.0.0/0
+
 
