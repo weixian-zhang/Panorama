@@ -8,6 +8,7 @@
 [Setup Workbook](#setup-a-workbook)  
 [Setup Dashboard](#setup-a-dashboard)  
 [Setup Log Collection](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
+[Network Monitoring](#network-monitoring)
 
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
@@ -17,7 +18,7 @@ Panorama consists of the following artifacts:
    * [Firewall Insights](#firewall-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
 * Dashboard
-   * [Inventory Dashboard](#inventory-dashboard)
+   * [Inventory Dashboard](#inventory-dashboard)  
 
 ### Setup a Workbook
 1. Copy Json content of any Panorama Workbook for example [IaaSInsights](https://github.com/weixian-zhang/Panorama/blob/master/Workbooks/IaaSInsights/IaaSInsights.workbook),  
@@ -60,5 +61,10 @@ It contains 3 general categories:
   and which Inbound and/or Outbound rules has destination address * | Any | 0.0.0.0/0  
   
   * Networking - Public IP: Shows all resources with Public IPs and Public IPs not assiciated to any resource.
+ 
+ ### Network Monitoring  
+ There isn't any workbook on Panorama repo on network and network service monitoring, but rather, this section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
+ * Azure Load Balancer Insights  
+   references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)
 
 
