@@ -64,7 +64,12 @@ It contains 3 general categories:
  
  ### Network Monitoring  
  There isn't any workbook on Panorama repo on network and network service monitoring, but rather, this section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
- * Azure Load Balancer Insights  
+ 
+ #### Azure Load Balancer Insights  
+   How does it help?  
+   * Topology visuals on load balancer rule to backend-pool resources with colored link-lines to show traffic health
+   * Data path availability and health probe status group by Frontend IP
+   * ...more will be added
    references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)
 
 
