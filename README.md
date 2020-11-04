@@ -4,11 +4,12 @@
   But Location paramater can be easily added.
 
 ### Content
-[Workbooks & Dasboard](#workbooks-and-dasboard)  
+[Panorama Workbooks & Dasboard](#workbooks-and-dasboard)  
 [Setup Workbook](#setup-a-workbook)  
 [Setup Dashboard](#setup-a-dashboard)  
 [Setup Log Collection](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
-[Network Monitoring](#network-monitoring)
+[Network Monitoring Guide](#network-monitoring-guide)  
+[VM Monitoring Guide](#vm-monitoring-guide)
 
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
@@ -62,7 +63,7 @@ It contains 3 general categories:
   
   * Networking - Public IP: Shows all resources with Public IPs and Public IPs not assiciated to any resource.
  
- ### Network Monitoring  
+ ### Network Monitoring Guide
  There isn't any workbook on Panorama repo on network and network service monitoring, but rather, this section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
  
  #### Azure Load Balancer Insights  
@@ -70,6 +71,10 @@ It contains 3 general categories:
    * Topology visuals on load balancer rule to backend-pool resources with colored link-lines to show traffic health
    * Data path availability and health probe status group by Frontend IP
    * ...more will be added
-   references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)
+   references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)  
+   
+   
+  ### VM Monitoring Guide  
+   
 
 
