@@ -7,7 +7,7 @@
 [Panorama Workbooks & Dasboard](#workbooks-and-dasboard)  
 [Setup Workbook](#setup-a-workbook)  
 [Setup Dashboard](#setup-a-dashboard)  
-[Setup Log Collection](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
+[Setup Azure Log Collection](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
 [Network Monitoring Guide](#network-monitoring-guide)  
 [VM Monitoring Guide](#vm-monitoring-guide)
 
@@ -68,7 +68,7 @@ It contains 3 general categories:
  A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools.
  
  #### - Azure Load Balancer Insights  
-   What this does?  
+    What this does?  
    * Topology visuals of load balancer rule to backend-pool resources with colored link-lines to show traffic health
    * Data path availability and health probe status group by Frontend IP
    * ...more will be added
@@ -76,7 +76,7 @@ It contains 3 general categories:
  
  #### - Network Performance Monitor (NPM)  
  
-   What this does?  
+    What this does?  
    
    Focusing on 2 aspects of NPM (exclude ExpressRoute monitoring):  
    **Performance Monitoring** and **Service Connectivity Monitoring (SCM)**.<br />
