@@ -112,7 +112,7 @@ It contains 3 general categories:
    #### Azure Monitor - Networks
    
    ---
-   #### Traffic Analytics (NSG Flow logs)  
+   #### Traffic Analytics (NSG Flow logs)<br /><br /><br />
    
  
  ### VM Monitoring Guide  
