@@ -67,12 +67,37 @@ It contains 3 general categories:
  This section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
  A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools.
  
- #### Azure Load Balancer Insights  
-   How does it help?  
-   * Topology visuals on load balancer rule to backend-pool resources with colored link-lines to show traffic health
+ #### - Azure Load Balancer Insights  
+   What this does?  
+   * Topology visuals of load balancer rule to backend-pool resources with colored link-lines to show traffic health
    * Data path availability and health probe status group by Frontend IP
    * ...more will be added
    references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)  
+ 
+ #### - Network Performance Monitor (NPM)  
+ 
+   What this does?  
+   
+   Focusing on 2 aspects of NPM (exclude ExpressRoute monitoring):  
+   **Performance Monitoring** and **Service Connectivity Monitoring (SCM)**.<br />
+   In a nutshell, NPM provides visual topology and info on VM to VM packet loss and latency(Performance Monitoring),  
+   and Http-based SaaS/PaaS URL monitoring(SCM).<br /><br />
+   * Performance Monitoring<br />
+     MMA agents in each VM acting like a "health beacon" send health probe(synthetic transactions) packets via TCP/ICMP to each other several times to measure and capture info like latency and packet percentage loss. Few terms to figure out before one can effectively use NPM solution UI:  
+      * Nodes: Actual VMs in subnets auto discovered from any VM with healthy MMA agent sending Heartbeat to workspace.
+      * SUBNETWORKS: Actual subnets of a VNet. Subnetworks are auto discovered when Nodes are discovered, therefore Subnetworks can't be manually added unlike NETWORKS.
+      * NETWORKS - This is similar to a VNet but its a logical network container for all discovered Subnetworks and can be any friendly name with spaces. Although Network could be a 1:1 to a VNet but it gives flexibility to group subnets in a another logical way apart from actual VNet.   
+     NPM solution UI navigation: 
+     <img src="./docs/guides/guides-npm-perfmon-nodetopology.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />  
+     
+   * Service Connectivity Monitoring
+     In addition to SCM able to monitor Internet-based SaaS Http/s connectivity, in my opinion SCM is also great at monitoring VM -> VNet-Injectable-PaaS like API Management Premium, Integrated Service Environment, Azure Function(Http-triggered) running in Azure Kubernetes and more. Since Performance Monitor already covers VM <-> VM network monitor, SCM can well focus on IaaS -> PaaS-in-VNet.
+   
+   references:  
+   * [Configure NPM solution](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor#set-up-and-configure)
+   * [Configure Performance Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-performance-monitor)
+   * [Configure Service Connectivity Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-service-connectivity)
+   * [video on Azure network monitor troubleshooting](https://www.youtube.com/watch?v=3J97zMYhSCw)
    
    
   ### VM Monitoring Guide  
