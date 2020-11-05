@@ -76,7 +76,7 @@ It contains 3 general categories:
    * Flow Distribution:
      * Inbound: Total count of request/traffic coming into LB and distributed to each of the backend VM
      * Outbound: Total count of outbound request/traffic created by eech of your VM  
-   references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)  
+ references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)  
  
  ---
  #### Network Performance Monitor (NPM)  
