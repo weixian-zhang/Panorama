@@ -65,14 +65,19 @@ It contains 3 general categories:
  
  ### Network Monitoring Guide
  This section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
- A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools.
+ A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools.  
+ 
+ references: 
  
  ---
  #### Azure Load Balancer Insights  
    What this does?  
-   * Topology visuals of load balancer rule to backend-pool resources with colored link-lines to show traffic health
-   * Data path availability and health probe status group by Frontend IP
-   * ...more will be added
+   * Topology visuals of load balancer IP -> LB rule to backend-pool resources with colored link-lines to show traffic health
+   * Availability: Backend pool health probe by backend VM IP addressa nd by Port. E.g: Backend VM can have healthy probes on port:80 but not port:443 due to no SSL cert setup.
+   * Data Throughput: How much Megabytes is going through your Load Balancer by Frontend IP and Port
+   * Flow Distribution:
+     * Inbound: Total count of request/traffic coming into LB and distributed to each of the backend VM
+     * Outbound: Total count of outbound request/traffic created by eech of your VM 
    references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)  
  
  ---
@@ -101,10 +106,16 @@ It contains 3 general categories:
    * [Configure NPM solution](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor#set-up-and-configure)
    * [Configure Performance Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-performance-monitor)
    * [Configure Service Connectivity Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-service-connectivity)
-   * [video on Azure network monitor troubleshooting](https://www.youtube.com/watch?v=3J97zMYhSCw)
+   * [video on Azure network monitor troubleshooting](https://www.youtube.com/watch?v=3J97zMYhSCw)  
    
+   ---
+   #### Azure Monitor - Networks
    
-  ### VM Monitoring Guide  
+   ---
+   #### Traffic Analytics (NSG Flow logs)  
+   
+ 
+ ### VM Monitoring Guide  
    
 
 
