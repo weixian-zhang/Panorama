@@ -64,7 +64,8 @@ It contains 3 general categories:
   * Networking - Public IP: Shows all resources with Public IPs and Public IPs not assiciated to any resource.
  
  ### Network Monitoring Guide
- There isn't any workbook on Panorama repo on network and network service monitoring, but rather, this section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
+ This section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
+ A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools.
  
  #### Azure Load Balancer Insights  
    How does it help?  
