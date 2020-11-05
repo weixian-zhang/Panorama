@@ -65,9 +65,7 @@ It contains 3 general categories:
  
  ### Network Monitoring Guide
  This section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
- A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools.  
- 
- references: 
+ A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools. 
  
  ---
  #### Azure Load Balancer Insights  
@@ -77,7 +75,7 @@ It contains 3 general categories:
    * Data Throughput: How much Megabytes is going through your Load Balancer by Frontend IP and Port
    * Flow Distribution:
      * Inbound: Total count of request/traffic coming into LB and distributed to each of the backend VM
-     * Outbound: Total count of outbound request/traffic created by eech of your VM 
+     * Outbound: Total count of outbound request/traffic created by eech of your VM  
    references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)  
  
  ---
