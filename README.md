@@ -108,6 +108,10 @@ It contains 3 general categories:
    
    ---
    #### Azure Monitor - Networks
+   This feature gives you an overall plus drill-down view on all nerworking resources in your environment.  
+   Below screenshot with navigation guiding on each feature.  
+   <img src="./docs/guides/guides-azmon-networks-overallview.png" width="650" height="400" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+
    
    ---
    #### Traffic Analytics (NSG Flow logs)<br /><br /><br />
