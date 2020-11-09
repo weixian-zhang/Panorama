@@ -27,12 +27,12 @@ Panorama consists of the following artifacts:
 3. Follow by clicking Code icon "</>"  
 4. Under **Gallery Template**, delete existing Json and paste in IaaSInsights Workbook Json content and hit "Apply"
    <img src="./docs/setup-workbook-1.png" width="450" height="250" align="left" />  
-   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
 2. Upload .json dashboard.  
-   <img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Activity Insights Workbook    
 * all general resource writes and deletes of your Azure environment
@@ -76,7 +76,8 @@ It contains 3 general categories:
    * Flow Distribution:
      * Inbound: Total count of request/traffic coming into LB and distributed to each of the backend VM
      * Outbound: Total count of outbound request/traffic created by eech of your VM  
- references: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)  
+   
+   References: [video](https://www.youtube.com/watch?v=qfzOTNKYTgU)  
  
  ---
  #### Network Performance Monitor (NPM)  
@@ -100,7 +101,7 @@ It contains 3 general categories:
      * Http/s test - VNet-Injectable-PaaS like API Management Premium, Integrated Service Environment, Azure Function(Http-triggered) running in Azure Kubernetes and more
      * Https test - Internet SaaS endpoints  
    
-   references:  
+   References:  
    * [Configure NPM solution](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor#set-up-and-configure)
    * [Configure Performance Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-performance-monitor)
    * [Configure Service Connectivity Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-service-connectivity)
