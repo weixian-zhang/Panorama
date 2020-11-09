@@ -27,7 +27,7 @@ Panorama consists of the following artifacts:
 3. Follow by clicking Code icon "</>"  
 4. Under **Gallery Template**, delete existing Json and paste in IaaSInsights Workbook Json content and hit "Apply"
    <img src="./docs/setup-workbook-1.png" width="450" height="250" align="left" />  
-   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
@@ -107,10 +107,20 @@ It contains 3 general categories:
    * [video on Azure network monitor troubleshooting](https://www.youtube.com/watch?v=3J97zMYhSCw)  
    
    ---
-   #### Azure Monitor - Networks
+   #### Azure Monitor - Networks Insights
    This feature gives you an overall plus drill-down view on all nerworking resources in your environment.  
    Below screenshot with navigation guiding on each feature.<br /><br />
    <img src="./docs/guides/guides-azmon-networks-overallview.png" width="750" height="450" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   
+   * Networks Insights Application Gateway Metrics<br /><br />
+     Key Metrics [explained](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-metrics#timing-metrics)  
+     (Backend connect time, Backend first byte response time, Backend last byte response time, Application gateway total time)  
+     
+     Click on Dependency View icon to go to Application Gateway Metrics
+     <img src="./docs/guides/guides-azmon-networks-appgw-dependencyview.png" width="750" height="450" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+     
+     <img src="./docs/guides/guides-azmon-networks-appgwmetrics.png" width="750" height="450" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   
 
    
    ---
