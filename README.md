@@ -9,7 +9,6 @@
 [Setup Dashboard](#setup-a-dashboard)  
 [Setup Azure Log Collection](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
 [Network Monitoring Guide](#network-monitoring-guide)  
-[VM Monitoring Guide](#vm-monitoring-guide)
 
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
@@ -127,10 +126,11 @@ It contains 3 general categories:
 
    
    ---
-   #### Traffic Analytics (NSG Flow logs)<br /><br /><br />
+   #### Traffic Analytics (NSG Flow logs)<br />
    
- 
- ### VM Monitoring Guide  
+   References:  
+   * [What is Traffic Analytics](https://docs.microsoft.com/en-us/azure/network-watcher/traffic-analytics)
+   * Traffics Analytics Table AzureNetworkAnalytics_CL [Schema](https://docs.microsoft.com/en-us/azure/network-watcher/traffic-analytics-schema#fields-used-in-traffic-analytics-schema) 
    
 
 
