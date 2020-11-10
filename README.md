@@ -66,7 +66,7 @@ It contains 3 general categories:
  Do check out a couple of great videos on entire [Azure Monitor landscape](https://www.youtube.com/watch?v=_MtrZOMQ18M) and another that covers [all current Azure networking tools](https://www.youtube.com/watch?v=3J97zMYhSCw). 
 
  * [Azure Load Balancer Insights](#azure-load-balancer-insights)
- * [Network Performance Monitor (NPM)](#network-performance-monitor-(npm))
+ * [Network Performance Monitor (NPM)](#network-performance-monitor-npm)
  
  ---
  #### Azure Load Balancer Insights  
