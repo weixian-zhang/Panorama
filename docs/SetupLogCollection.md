@@ -24,7 +24,7 @@
    
 #### Activity Log to Log Analytics Workspace  
 <img src="Setuplog-ActivityLog-DiagnosticSettings.png" width="500" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-<img src="Setuplog-ActivityLog-DiagnosticSettings-2.png" width="550" height="350" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<img src="Setuplog-ActivityLog-DiagnosticSettings-2.png" width="550" height="350" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 #### NSG Flow logs & Traffic Analytics
 Go to Network Watcher -> NSG Flow logs and watch out for NSG with Status "Disabled".  
