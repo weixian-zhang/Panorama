@@ -30,7 +30,7 @@ Panorama consists of the following artifacts:
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
 2. Upload .json dashboard.  
-   <img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br />
 
 ### Activity Insights Workbook    
 * all general resource writes and deletes of your Azure environment
@@ -64,6 +64,9 @@ It contains 3 general categories:
  ### Network Monitoring Guide
  This section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
  Do check out a couple of great videos on entire [Azure Monitor landscape](https://www.youtube.com/watch?v=_MtrZOMQ18M) and another that covers [all current Azure networking tools](https://www.youtube.com/watch?v=3J97zMYhSCw). 
+
+ * [Azure Load Balancer Insights](#azure-load-balancer-insights)
+ * [Network Performance Monitor (NPM)](#network-performance-monitor-(npm))
  
  ---
  #### Azure Load Balancer Insights  
