@@ -67,7 +67,7 @@ It contains 3 general categories:
 
  * [Azure Load Balancer Insights](#azure-load-balancer-insights)
  * [Network Performance Monitor (NPM)](#network-performance-monitor-npm)
- * [Azure Monitor - Networks Insights](#azure-monitor-networks---insights)
+ * [Azure Monitor - Networks Insights](#azure-monitor-networks-insights)
  * [Traffic Analytics (NSG Flow logs)](#traffic-analytics-nsg-flow-logs)
  
  ---
