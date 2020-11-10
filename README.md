@@ -63,7 +63,7 @@ It contains 3 general categories:
  
  ### Network Monitoring Guide
  This section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
- A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools. 
+ Do check out a couple of great videos on entire [Azure Monitor landscape](https://www.youtube.com/watch?v=_MtrZOMQ18M) and another that covers [all current Azure networking tools](https://www.youtube.com/watch?v=3J97zMYhSCw). 
  
  ---
  #### Azure Load Balancer Insights  
