@@ -103,7 +103,6 @@ It contains 3 general categories:
    * [Configure NPM solution](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor#set-up-and-configure)
    * [Configure Performance Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-performance-monitor)
    * [Configure Service Connectivity Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-service-connectivity)
-   * [video on Azure network monitor troubleshooting](https://www.youtube.com/watch?v=3J97zMYhSCw)  
    
    ---
    #### Azure Monitor - Networks Insights
