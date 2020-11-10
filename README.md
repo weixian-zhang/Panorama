@@ -25,7 +25,7 @@ Panorama consists of the following artifacts:
 3. Follow by clicking Code icon "</>"  
 4. Under **Gallery Template**, delete existing Json and paste in IaaSInsights Workbook Json content and hit "Apply"
    <img src="./docs/setup-workbook-1.png" width="450" height="250" align="left" />  
-   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
@@ -67,6 +67,8 @@ It contains 3 general categories:
 
  * [Azure Load Balancer Insights](#azure-load-balancer-insights)
  * [Network Performance Monitor (NPM)](#network-performance-monitor-npm)
+ * [Azure Monitor - Networks Insights](#azure-monitor-networks-insights)
+ * [Traffic Analytics (NSG Flow logs)](#traffic-analytics-nsg-flow-logs)
  
  ---
  #### Azure Load Balancer Insights  
