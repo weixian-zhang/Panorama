@@ -1,13 +1,16 @@
 
-  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, resource performance, capacity and security. This project is inspired by [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity), but with more focus on security monitoring.  
-  The workbooks does not currently contain Location filtering as they are built for the purpose of, a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
+  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, performance, and security. Certain KQLs are adpated from [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity).  
+  The workbooks does not currently contain Location filtering, as they are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
 
 ### Content
-[Panorama Workbooks & Dasboard](#workbooks-and-dasboard)  
-[Setup Workbook](#setup-a-workbook)  
-[Setup Dashboard](#setup-a-dashboard)  
-[Setup Azure Log Collection](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
-[Network Monitoring Guide](#network-monitoring-guide)  
+[What Panorama offers?](#what-panorama-offers)  
+[Workbooks & Dasboard](#workbooks-and-dasboard)  
+[How to setup a Workbook](#setup-a-workbook)  
+[How to setup a Dashboard](#setup-a-dashboard)  
+[Where to collect logs from](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
+[Network Monitoring Tool Guide](#network-monitoring-guide)  
+
+### What Panorama Offers  
 
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
