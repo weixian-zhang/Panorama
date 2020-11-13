@@ -1,6 +1,6 @@
 
   Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, performance, and security. Certain KQLs are adapted from [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity).  
-  The workbooks does not currently contain Location parameter, as they are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
+  The workbooks does not currently contain Location parameter, as workbooks and dashboard are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
 
 ### Content
 [What Panorama offers?](#what-panorama-offers)  
@@ -11,6 +11,15 @@
 [Network Monitoring Tool Guide](#network-monitoring-guide)  
 
 ### What Panorama Offers  
+Panorama contains supplementry monitoring viewpoints in the form of Workbooks and Dashboard in addition to existing community and built-in Azure workbooks.
+The workbooks are built on requirements gathered from a local goverment commercial cloud program and some differentiating info these workbooks provide are:
+- [x] What NSG rules are created/updated, who did it and when?
+- [x] What Azure Firewall rules are created/updated categorized by NAT, Network and App rules, who did it and when?
+- [x] What are the Threats Azure Firewall has protected me against? IP of the source of threats and when?
+- [x] A summary of all writes and deletes happening in my environment, who did it and when
+- [x] How much disk space does each of my VM and each drive are left with?
+- [x] How much memory available out of total memory?
+- [x] Which VMs have missing Critial and Security Patches and clearly state names of missing patches for every VM?
 
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
@@ -19,6 +28,7 @@ Panorama consists of the following artifacts:
    * [IaaS Insights](#iaas-insights-workbook)
    * [Firewall Insights](#firewall-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
+   * Traffic Search (coming soon...)
 * Dashboard
    * [Inventory Dashboard](#inventory-dashboard)  
 
