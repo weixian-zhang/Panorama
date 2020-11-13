@@ -1,6 +1,6 @@
 
-  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, performance, and security. Certain KQLs are adpated from [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity).  
-  The workbooks does not currently contain Location filtering, as they are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
+  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, performance, and security. Certain KQLs are adapted from [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity).  
+  The workbooks does not currently contain Location parameter, as they are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
 
 ### Content
 [What Panorama offers?](#what-panorama-offers)  
@@ -16,7 +16,7 @@
 Panorama consists of the following artifacts:  
 * Workbooks  
    * [Activity Insights](#activity-insights-workbook)
-   * [IaaS Insights](#iaaS-insights-workbook)
+   * [IaaS Insights](#iaas-insights-workbook)
    * [Firewall Insights](#firewall-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
 * Dashboard
@@ -123,7 +123,7 @@ It contains 3 general categories:
    
    * Networks Insights - Application Gateway Dependency View<br /><br />
      Key Metrics [explained](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-metrics#timing-metrics)  
-     (Backend connect time, Backend first byte response time, Backend last byte response time, Application gateway total time)  
+     (Backend connection time, Backend first and last byte response time, total time, client round trip time)  
      
      Click on Dependency View icon to go to Application Gateway Metrics
      <img src="./docs/guides/guides-azmon-networks-appgw-dependencyview.png" width="750" height="450" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
