@@ -18,8 +18,8 @@ The workbooks are built on requirements gathered from a local goverment commerci
 - [x] What are the Threats Azure Firewall has protected me against? IP of the source of threats and when?
 - [x] A summary of all writes and deletes happening in my environment, who did it and when
 - [x] How much disk space does each of my VM and each drive are left with?
-- [x] How much memory available out of total memory?
-- [x] Which VMs have missing Critial and Security Patches and clearly state names of missing patches for every VM?
+- [x] How much memory available currently out of total VM memory?
+- [x] Which VMs have missing Critical and Security Patches and clearly state names of missing patches for every VM?
 
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
