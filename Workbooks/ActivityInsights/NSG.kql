@@ -106,7 +106,7 @@ let NSGRulesNotGroup =
             ActionType in ("ACTION", "WRITE", "DELETE") and
             OperationNameValue has "securityRules" and //*only rules, union security group above
             ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
-            TimeGenerated > ago(200d)
+            TimeGenerated {TimeRange}
         | join kind=inner ( //join to get all user related info like IsServicePrincipal, role, name from ActivityStatusValue = Success
             AzureActivity
                 | where ActivityStatusValue == "Success"

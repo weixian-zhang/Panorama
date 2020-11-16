@@ -1,0 +1,77 @@
+AzureNetworkAnalytics_CL
+| extend FlowType = FlowType_s
+| extend NSGAccess = iif(FlowStatus_s == "A", "Allow", "Deny")
+| extend SrcSubnet = Subnet1_s //source vm subnet
+| extend SrcVMName = tostring(split(VM1_s,"/")[1])  //src VM name
+| extend DestSubnet = Subnet2_s //dest vm subnet
+| extend DestVMName = tostring(split(VM2_s,"/")[1]) //dest VM vm name
+| extend DestPort = DestPort_d
+| extend L4Protocol = iif(L4Protocol_s == "T", "TCP", "UDP")
+| extend L7Protocol = L7Protocol_s
+| extend NSG = tostring(split(NSGList_s,"/")[2])
+| extend NSGRule = NSGRule_s
+| extend NoOfAllowedInboundFlow = AllowedInFlows_d
+| extend NoOfAllowedOutboundFlow = AllowedOutFlows_d
+| extend NoOfDeniedInboundFlow = DeniedInFlows_d
+| extend NoOfDeniedOutboundFlow = DeniedOutFlows_d
+| extend SrcPublicIp = SrcPublicIPs_s
+| extend DestPublicIp = DestPublicIPs_s
+| where SubType_s == "FlowLog" and TimeGenerated > ago(2d) 
+| join kind=leftouter (
+ NetworkMonitoring
+ | extend AvgLatency = iif(HighLatency == -1, "not found in NPM", strcat(tostring(round(HighLatency,1)), "ms")) 
+ | extend PacketLossPercent = iif(HighLatency == -1, "not found in NPM", strcat(tostring(Loss), "%"))
+ | where TimeGenerated > ago(2d)
+ | summarize AvgLatency = max(AvgLatency), PacketLossPercent = max(PacketLossPercent) by SourceNetworkNodeInterface, DestinationNetworkNodeInterface
+) on $left.SrcIP_s == $right.SourceNetworkNodeInterface and $left.DestIP_s == $right.DestinationNetworkNodeInterface
+| where FlowType_s in ({FlowType})
+| where FlowStatus_s in ({NSGAccess})
+| where FlowDirection_s in ({Direction})
+| where SrcVMName in ({SrcVMName})
+| where DestVMName in ({DestVMName})
+| distinct 
+    TimeGenerated,
+    FlowType, 
+    NSG, 
+    NSGRule, 
+    NSGAccess,
+    SrcSubnet,
+    SrcVMName, 
+    SrcIP_s, 
+    SrcPublicIp, 
+    DestSubnet,
+    DestVMName, 
+    DestIP_s, 
+    DestPublicIp, 
+    DestPort, 
+    L4Protocol, 
+    L7Protocol, 
+    AvgLatency, 
+    PacketLossPercent, 
+    NoOfAllowedInboundFlow, 
+    NoOfAllowedOutboundFlow, 
+    NoOfDeniedInboundFlow, 
+    NoOfDeniedOutboundFlow
+| project 
+    Time = TimeGenerated,
+    ["Flow Type"] = FlowType, 
+    NSG, 
+    NSGRule, 
+    NSGAccess,
+    ["Src Subnet"] = SrcSubnet,
+    ["Src VM"] = SrcVMName, 
+    ["Src VM IP"] = SrcIP_s, 
+    ["Src VM Public IP"] = SrcPublicIp, 
+    ["Dest Subnet"] = DestSubnet,
+    ["Dest VM"] = DestVMName, 
+    ["Dest VM IP"] = DestIP_s, 
+    ["Dest VM Public IP"] = DestPublicIp, 
+    DestPort, 
+    L4Protocol, 
+    L7Protocol, 
+    AvgLatency, 
+    PacketLossPercent, 
+    NoOfAllowedInboundFlow, 
+    NoOfAllowedOutboundFlow, 
+    NoOfDeniedInboundFlow, 
+    NoOfDeniedOutboundFlow

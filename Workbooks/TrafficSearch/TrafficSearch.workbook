@@ -1,0 +1,496 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "cedac194-1405-44c1-9356-d5e808042493",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "type": 6,
+            "isRequired": true,
+            "value": "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1"
+              ],
+              "includeAll": true
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1"
+          },
+          {
+            "id": "25d13655-2fac-4baa-bd42-24085f1b5031",
+            "version": "KqlParameterItem/1.0",
+            "name": "Workspace",
+            "type": 5,
+            "query": "where type =~ 'microsoft.operationalinsights/workspaces'\r\n| order by name asc\r\n| project value = id, label = id",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352/resourceGroups/CH-OpsRG-Pri/providers/Microsoft.OperationalInsights/workspaces/CH-LA",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1",
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "50bb08f8-f8d9-49ac-8fcc-cf966a87bd38",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time Range",
+            "type": 4,
+            "isRequired": true,
+            "value": {
+              "durationMs": 604800000
+            },
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ],
+              "allowCustom": true
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 0"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
+        "parameters": [
+          {
+            "id": "6709d961-efe7-4e9f-ae8b-1d47fe706f7f",
+            "version": "KqlParameterItem/1.0",
+            "name": "SrcVMName",
+            "label": "Source VMs",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "\"",
+            "delimiter": ",",
+            "query": "Resources\r\n| where type == \"microsoft.compute/virtualmachines\"\r\n| project value = tolower(name), label = name",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "9a0d47a0-6eae-421f-8a58-ac08f6e3cd99",
+            "version": "KqlParameterItem/1.0",
+            "name": "DestVMName",
+            "label": "Dest VMs",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "\"",
+            "delimiter": ",",
+            "query": "Resources\r\n| where type == \"microsoft.compute/virtualmachines\"\r\n| project value = tolower(name), label = name",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "value": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "parameters - 2"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "d82133de-004c-4031-a325-26d814ece678",
+            "version": "KqlParameterItem/1.0",
+            "name": "FlowType",
+            "label": "Flow Type",
+            "type": 2,
+            "description": "Types of flow, Intra-VNet, Inter Peered VNets, External Public IP, Azure-owned Public IP or Azure controlplane Public IPs",
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "\"",
+            "delimiter": ",",
+            "value": [
+              "ExternalPublic",
+              "AzurePublic"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    {\r\n        \"value\": \"IntraVNet\",\r\n        \"label\": \"Traffic to/from same VNet\"\r\n    },\r\n    {\r\n        \"value\": \"InterVNet\",\r\n        \"label\": \"Traffic to/from peered VNets\"\r\n    },\r\n    {\r\n        \"value\": \"ExternalPublic\",\r\n        \"label\": \"Traffic to/from External Public IPs (non-Azure)\"\r\n    },\r\n    {\r\n        \"value\": \"AzurePublic\",\r\n        \"label\": \"Traffic to/from Azure-owned Public IPs\"\r\n    }\r\n]",
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          },
+          {
+            "id": "d82133de-004c-4031-a325-26d814ece678",
+            "version": "KqlParameterItem/1.0",
+            "name": "Direction",
+            "label": "NSG Direction",
+            "type": 2,
+            "description": "NSG Inbound/Outbound",
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "\"",
+            "delimiter": ",",
+            "value": [
+              "I",
+              "O"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    {\r\n        \"value\": \"I\",\r\n        \"label\": \"Inbound\"\r\n    },\r\n    {\r\n        \"value\": \"O\",\r\n        \"label\": \"Outbound\"\r\n    }\r\n]",
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          },
+          {
+            "id": "d82133de-004c-4031-a325-26d814ece678",
+            "version": "KqlParameterItem/1.0",
+            "name": "NSGAccess",
+            "type": 2,
+            "description": "NSG Allow/Deny",
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "\"",
+            "delimiter": ",",
+            "value": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "jsonData": "[\r\n    {\r\n        \"value\": \"A\",\r\n        \"label\": \"Allow\"\r\n    },\r\n    {\r\n        \"value\": \"D\",\r\n        \"label\": \"Deny\"\r\n    }\r\n]",
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 3"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureNetworkAnalytics_CL\r\n| extend FlowType = FlowType_s\r\n| extend NSGAccess = iif(FlowStatus_s == \"A\", \"Allow\", \"Deny\")\r\n| extend SrcSubnet = Subnet1_s //source vm subnet\r\n| extend SrcVMName = tostring(split(VM1_s,\"/\")[1])  //src VM name\r\n| extend DestSubnet = Subnet2_s //dest vm subnet\r\n| extend DestVMName = tostring(split(VM2_s,\"/\")[1]) //dest VM vm name\r\n| extend DestPort = DestPort_d\r\n| extend L4Protocol = iif(L4Protocol_s == \"T\", \"TCP\", \"UDP\")\r\n| extend L7Protocol = L7Protocol_s\r\n| extend NSG = tostring(split(NSGList_s,\"/\")[2])\r\n| extend NSGRule = NSGRule_s\r\n| extend NoOfAllowedInboundFlow = AllowedInFlows_d\r\n| extend NoOfAllowedOutboundFlow = AllowedOutFlows_d\r\n| extend NoOfDeniedInboundFlow = DeniedInFlows_d\r\n| extend NoOfDeniedOutboundFlow = DeniedOutFlows_d\r\n| extend SrcPublicIp = SrcPublicIPs_s\r\n| extend DestPublicIp = DestPublicIPs_s\r\n| where SubType_s == \"FlowLog\" and TimeGenerated > ago(2d) \r\n| join kind=leftouter (\r\n NetworkMonitoring\r\n | extend AvgLatency = iif(HighLatency == -1, \"not found in NPM\", strcat(tostring(round(HighLatency,1)), \"ms\")) \r\n | extend PacketLossPercent = iif(HighLatency == -1, \"not found in NPM\", strcat(tostring(Loss), \"%\"))\r\n | where TimeGenerated > ago(2d)\r\n | summarize AvgLatency = max(AvgLatency), PacketLossPercent = max(PacketLossPercent) by SourceNetworkNodeInterface, DestinationNetworkNodeInterface\r\n) on $left.SrcIP_s == $right.SourceNetworkNodeInterface and $left.DestIP_s == $right.DestinationNetworkNodeInterface\r\n| where FlowType_s in ({FlowType})\r\n| where FlowStatus_s in ({NSGAccess})\r\n| where FlowDirection_s in ({Direction})\r\n| where SrcVMName in ({SrcVMName})\r\n| where DestVMName in ({DestVMName})\r\n| distinct \r\n    TimeGenerated,\r\n    FlowType, \r\n    NSG, \r\n    NSGRule, \r\n    NSGAccess,\r\n    SrcSubnet,\r\n    SrcVMName, \r\n    SrcIP_s, \r\n    SrcPublicIp, \r\n    DestSubnet,\r\n    DestVMName, \r\n    DestIP_s, \r\n    DestPublicIp, \r\n    DestPort, \r\n    L4Protocol, \r\n    L7Protocol, \r\n    AvgLatency, \r\n    PacketLossPercent, \r\n    NoOfAllowedInboundFlow, \r\n    NoOfAllowedOutboundFlow, \r\n    NoOfDeniedInboundFlow, \r\n    NoOfDeniedOutboundFlow\r\n| project \r\n    Time = TimeGenerated,\r\n    [\"Flow Type\"] = FlowType, \r\n    NSG, \r\n    NSGRule, \r\n    NSGAccess,\r\n    [\"Src Subnet\"] = SrcSubnet,\r\n    [\"Src VM\"] = SrcVMName, \r\n    [\"Src VM IP\"] = SrcIP_s, \r\n    [\"Src VM Public IP\"] = SrcPublicIp, \r\n    [\"Dest Subnet\"] = DestSubnet,\r\n    [\"Dest VM\"] = DestVMName, \r\n    [\"Dest VM IP\"] = DestIP_s, \r\n    [\"Dest VM Public IP\"] = DestPublicIp, \r\n    DestPort, \r\n    L4Protocol, \r\n    L7Protocol, \r\n    AvgLatency, \r\n    PacketLossPercent, \r\n    NoOfAllowedInboundFlow, \r\n    NoOfAllowedOutboundFlow, \r\n    NoOfDeniedInboundFlow, \r\n    NoOfDeniedOutboundFlow",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{Workspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Time",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "21ch"
+              }
+            },
+            {
+              "columnMatch": "Flow Type",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "11ch"
+              }
+            },
+            {
+              "columnMatch": "NSG",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "16ch"
+              }
+            },
+            {
+              "columnMatch": "Src Subnet",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "turquoise",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "Src VM",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "turquoise",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "Src VM IP",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "turquoise",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "Src VM Public IP",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "turquoise",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "Dest Subnet",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "yellow",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "Dest VM",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "yellow",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "Dest VM IP",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "yellow",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "Dest VM Public IP",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "yellow",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "DestPort",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "yellow",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "AvgLatency",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "gray",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "PacketLossPercent",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "colors",
+                "thresholdsGrid": [
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "gray",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "name": "query - 1"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
