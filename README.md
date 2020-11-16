@@ -1,21 +1,34 @@
 
-  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, resource performance, capacity and security. This project is inspired by [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity), but with more focus on security monitoring.  
-  The workbooks does not currently contain Location filtering as they are built for the purpose of, a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
+  Panorama is a project about making Azure environment observable, giving Azure users insights to deloyed resources, performance, and security. Certain KQLs are adapted from [Azure Monitor Community](https://github.com/microsoft/AzureMonitorCommunity).  
+  The workbooks does not currently contain Location parameter, as workbooks and dashboard are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
 
 ### Content
-[Panorama Workbooks & Dasboard](#workbooks-and-dasboard)  
-[Setup Workbook](#setup-a-workbook)  
-[Setup Dashboard](#setup-a-dashboard)  
-[Setup Azure Log Collection](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
-[Network Monitoring Guide](#network-monitoring-guide)  
+[What Panorama offers?](#what-panorama-offers)<br /><br />
+[Artifacts - Workbooks & Dasboard](#workbooks-and-dasboard)<br /><br />
+[How to setup a Workbook](#setup-a-workbook)<br /><br />
+[How to setup a Dashboard](#setup-a-dashboard)<br /><br />
+[Collect Logs](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)<br /><br />
+[Guide - Azure Network Monitoring Tools](#network-monitoring-guide)  
+
+### What Panorama Offers  
+Panorama contains supplementry monitoring viewpoints in the form of Workbooks and Dashboard in addition to existing community and built-in Azure workbooks.
+The workbooks are built on requirements gathered from a local goverment commercial cloud program and some differentiating info these workbooks provide are:
+- [x] What NSG rules are created/updated, who did it and when?
+- [x] What Azure Firewall rules are created/updated categorized by NAT, Network and App rules, who did it and when?
+- [x] What are the Threats Azure Firewall has protected me against? IP of the source of threats and when?
+- [x] A summary of all writes and deletes happening in my environment, who did it and when
+- [x] How much disk space does each of my VM and each drive are left with?
+- [x] How much memory available currently out of total VM memory?
+- [x] Which VMs have missing Critical and Security Patches and clearly state names of missing patches for every VM?
 
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
 * Workbooks  
    * [Activity Insights](#activity-insights-workbook)
-   * [IaaS Insights](#iaaS-insights-workbook)
+   * [IaaS Insights](#iaas-insights-workbook)
    * [Firewall Insights](#firewall-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
+   * Traffic Search (coming soon...)
 * Dashboard
    * [Inventory Dashboard](#inventory-dashboard)  
 
@@ -30,7 +43,7 @@ Panorama consists of the following artifacts:
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
 2. Upload .json dashboard.  
-   <img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-dashboard.png" width="350" height="200" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Activity Insights Workbook    
 * all general resource writes and deletes of your Azure environment
@@ -63,7 +76,12 @@ It contains 3 general categories:
  
  ### Network Monitoring Guide
  This section provides a summary of the available Azure network monitoring tools and how to setup and use them.  
- A great [video](https://www.youtube.com/watch?v=3J97zMYhSCw) that covers all current Azure networking tools. 
+ Do check out a couple of great videos on entire [Azure Monitor landscape](https://www.youtube.com/watch?v=_MtrZOMQ18M) and another that covers [all current Azure networking tools](https://www.youtube.com/watch?v=3J97zMYhSCw). 
+
+ * [Azure Load Balancer Insights](#azure-load-balancer-insights)
+ * [Network Performance Monitor (NPM)](#network-performance-monitor-npm)
+ * [Azure Monitor - Networks Insights](#azure-monitor---networks-insights)
+ * [Traffic Analytics (NSG Flow logs)](#traffic-analytics-nsg-flow-logs)
  
  ---
  #### Azure Load Balancer Insights  
@@ -103,7 +121,6 @@ It contains 3 general categories:
    * [Configure NPM solution](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor#set-up-and-configure)
    * [Configure Performance Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-performance-monitor)
    * [Configure Service Connectivity Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor-service-connectivity)
-   * [video on Azure network monitor troubleshooting](https://www.youtube.com/watch?v=3J97zMYhSCw)  
    
    ---
    #### Azure Monitor - Networks Insights
@@ -116,7 +133,7 @@ It contains 3 general categories:
    
    * Networks Insights - Application Gateway Dependency View<br /><br />
      Key Metrics [explained](https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-metrics#timing-metrics)  
-     (Backend connect time, Backend first byte response time, Backend last byte response time, Application gateway total time)  
+     (Backend connection time, Backend first and last byte response time, total time, client round trip time)  
      
      Click on Dependency View icon to go to Application Gateway Metrics
      <img src="./docs/guides/guides-azmon-networks-appgw-dependencyview.png" width="750" height="450" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
