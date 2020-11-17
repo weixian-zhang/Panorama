@@ -49,7 +49,6 @@ AzureNetworkAnalytics_CL
 
    {KqlWhereSrcVMName} //from hidden param
    {KqlWhereDestVMName} //from hidden param
-| take 100
 | distinct 
     TimeGenerated,
     FlowType, 
@@ -87,11 +86,11 @@ AzureNetworkAnalytics_CL
     ["Src Subnet"] = SrcSubnet,
     ["Src VM"] = iif(SrcVMName == "unknown-vm", "unknown/PaaS", SrcVMName) , 
     ["Src VM IP"] = SrcIP_s, 
-    ["Src VM Public IP"] = SrcPublicIps, 
+    ["Src VM Public IP"] = replace("168.63.129.16", "Azure WireServer", SrcPublicIps), 
     ["Dest Subnet"] = DestSubnet,
     ["Dest VM"] = iif(DestVMName == "unknown-vm", "unknown/PaaS", DestVMName), 
     ["Dest VM IP"] = DestIP_s, 
-    ["Dest VM Public IP"] = DestPublicIps, 
+    ["Dest VM Public IP"] = replace("168.63.129.16", "Azure WireServer", DestPublicIps), 
     DestPort, 
     L4Protocol, 
     L7Protocol,
