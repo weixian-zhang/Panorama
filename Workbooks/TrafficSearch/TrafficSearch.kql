@@ -1,5 +1,6 @@
 AzureNetworkAnalytics_CL
 | extend FlowType = FlowType_s
+| extend FlowDirection = iif(FlowDirection_s == "I","Inbound", "Outbound")
 | extend NSGAccess = iif(FlowStatus_s == "A", "Allow", "Deny")
 | extend SrcSubnet = Subnet1_s //source vm subnet
 | extend SrcVMName = tostring(split(VM1_s, "/")[1])  //src VM name
@@ -53,7 +54,8 @@ AzureNetworkAnalytics_CL
     TimeGenerated,
     FlowType, 
     NSG, 
-    NSGRule, 
+    NSGRule,
+    FlowDirection,
     NSGAccess,
     SrcSubnet,
     SrcVMName, 
@@ -78,9 +80,10 @@ AzureNetworkAnalytics_CL
 | project 
     ["Time(UTC+8)"] = datetime_add('hour',8,TimeGenerated),
     ["Flow Type"] = FlowType, 
-    NSG, 
-    NSGRule, 
-    NSGAccess,
+    ["NSG"] = NSG, 
+    ["NSG Rule"] = NSGRule, 
+    ["Allow / Deny"] = NSGAccess,
+    ["Flow Direction"] = FlowDirection,
     ["Src Subnet"] = SrcSubnet,
     ["Src VM"] = iif(SrcVMName == "unknown-vm", "unknown/PaaS", SrcVMName) , 
     ["Src VM IP"] = SrcIP_s, 
