@@ -13,7 +13,7 @@
 ### What Panorama Offers  
 Panorama contains supplementry monitoring viewpoints in the form of Workbooks and Dashboard in addition to existing community and built-in Azure workbooks.
 The workbooks are built on requirements gathered from a local goverment commercial cloud program and some differentiating info these workbooks provide are:
-- [x] What NSG rules are being created/\ or updated, who did it and when?
+- [x] What NSG rules are being created or updated, who did it and when?
 - [x] What Azure Firewall rules are being created or updated categorized by NAT, Network and App rules, who did it and when?
 - [x] What are the Threats Azure Firewall has protected me against? IP of the source of threats and when?
 - [x] A summary of all writes and deletes happening in my environment, who did it and when
