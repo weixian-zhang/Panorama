@@ -345,7 +345,8 @@
         "size": 0,
         "noDataMessage": "No traffic found from parameter filters",
         "timeContext": {
-          "durationMs": 0
+          "durationMs": 3600000,
+          "endTime": "2020-11-17T13:00:00.000Z"
         },
         "timeContextFromParameter": "TimeRange",
         "exportedParameters": [
