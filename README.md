@@ -3,23 +3,24 @@
   The workbooks does not currently contain Location parameter, as workbooks and dashboard are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.  
 
 ### Content
-[What Panorama offers?](#what-panorama-offers)<br /><br />
-[Artifacts - Workbooks & Dasboard](#workbooks-and-dasboard)<br /><br />
-[How to setup a Workbook](#setup-a-workbook)<br /><br />
-[How to setup a Dashboard](#setup-a-dashboard)<br /><br />
-[Collect Logs](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)<br /><br />
+[What Panorama offers?](#what-panorama-offers)  
+[Artifacts - Workbooks & Dasboard](#workbooks-and-dasboard)  
+[How to setup a Workbook](#setup-a-workbook)  
+[How to setup a Dashboard](#setup-a-dashboard)  
+[Collect Logs](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)  
 [Guide - Azure Network Monitoring Tools](#network-monitoring-guide)  
 
 ### What Panorama Offers  
 Panorama contains supplementry monitoring viewpoints in the form of Workbooks and Dashboard in addition to existing community and built-in Azure workbooks.
 The workbooks are built on requirements gathered from a local goverment commercial cloud program and some differentiating info these workbooks provide are:
-- [x] What NSG rules are created/updated, who did it and when?
-- [x] What Azure Firewall rules are created/updated categorized by NAT, Network and App rules, who did it and when?
+- [x] What NSG rules are being created or updated, who did it and when?
+- [x] What Azure Firewall rules are being created or updated categorized by NAT, Network and App rules, who did it and when?
 - [x] What are the Threats Azure Firewall has protected me against? IP of the source of threats and when?
 - [x] A summary of all writes and deletes happening in my environment, who did it and when
-- [x] How much disk space does each of my VM and each drive are left with?
+- [x] What are the network traffics within a VNet(Intra-VNet), inter-peered VNets, to and from between any External Public IPs or Azure-owned control-plane Public IPs?
+- [x] For each of my VM, how much disk space does each logical drive are left with?
 - [x] How much memory available currently out of total VM memory?
-- [x] Which VMs have missing Critical and Security Patches and clearly state names of missing patches for every VM?
+- [x] Which VMs have missing Critical and Security Patches and what are the missing patches?
 
 ### Workbooks and Dasboard  
 Panorama consists of the following artifacts:  
@@ -38,7 +39,7 @@ Panorama consists of the following artifacts:
 3. Follow by clicking Code icon "</>"  
 4. Under **Gallery Template**, delete existing Json and paste in IaaSInsights Workbook Json content and hit "Apply"
    <img src="./docs/setup-workbook-1.png" width="450" height="250" align="left" />  
-   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
