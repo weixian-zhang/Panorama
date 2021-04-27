@@ -2,7 +2,7 @@
 
 1. [Connect VMs To Log Analytics](#connect-vms-to-log-analytics)
 2. [Setup Performance Counters](#setup-performance-counters)
-3. [Enable Azure Monitor for VM](#enable-azure-monitor for VM)
+3. [Enable Azure Monitor for VM](#enable-azure-monitor-for-vm)
 4. [Enable Update Management](#enable-update-management)
 5. [Enable Inventory & Change Tracking](#enable-inventory--change-tracking)
 6. [Activity Log to Log Analytics Workspace](#activity-log-to-log-analytics-workspace)
