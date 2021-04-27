@@ -1,29 +1,30 @@
 ### Setup Log Collection  
 
-1. Connect VMs Log Analytics
-2. Setup Performance Counters configuration
-3. Enable Azure Monitor for VM
-4. Enable Update Management on VMs
-5. Enable Change Tracking on VMs
-6. Activity Log to Log Analytics Workspace  
-7. Enable NSG Flow logs & Traffic Analytics
-8. Add Network Performance Monitoring solution
+1. [Connect VMs To Log Analytics](#connect-vms-to-log-analytics)
+2. [Setup Performance Counters](#setup-performance-counters)
+3. [Enable Azure Monitor for VM](#enable-azure-monitor for VM)
+4. [Enable Update Management](#enable-update-management)
+5. [Enable Inventory & Change Tracking](#enable-inventory--change-tracking)
+6. [Activity Log to Log Analytics Workspace](#activity-log-to-log-analytics-workspace)
+7. [Enable NSG Flow logs & Traffic Analytics](#nsg-flow-logs--traffic-analytics)
+8. [Add Network Performance Monitoring solution](#network-performance-monitor-solution)
 
-#### Connect all VMs to Log Analytics Workspace through
+####  Connect VMs to Log Analytics
 * Azure Portal  
   <img src="Setuplog-ConnectVMToLaw.png" width="500" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 * Or through [Powershell](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/vminsights-enable-powershell)<br /><br />
    
-#### Add Linux and Windows Performance Counters configuration for Log Analytics agent to collect from VMs  
+#### Setup Performance Counters    
+Add Linux and Windows Performance Counters configuration for Log Analytics agent to collect from VMs  
 <img src="Setuplog-AddPerfCounters.png" width="550" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
-#### Enable Azure Monitor for VM  
+#### Enable Azure Monitor for VM 
 <img src="Setuplog-EnableMonitorForVM.png" width="550" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
-#### Enable Update Management on VMs
+#### Enable Update Management
 [See docs](https://docs.microsoft.com/en-us/azure/automation/update-management/enable-from-vm)
    
-#### Enable Change Tracking on VMs  
+#### Enable Inventory & Change Tracking
 [See docs](https://docs.microsoft.com/en-us/azure/automation/change-tracking/enable-from-vm)
 <img src="Setuplog-EnableChangeTracking.png" width="450" height="300" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />  
    
