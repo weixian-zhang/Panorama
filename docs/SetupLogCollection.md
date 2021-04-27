@@ -3,10 +3,11 @@
 1. Connect VMs Log Analytics
 2. Setup Performance Counters configuration
 3. Enable Azure Monitor for VM
-4. Enable Change Tracking
-5. Activity Log to Log Analytics Workspace  
-6. Enable NSG Flow logs & Traffic Analytics
-7. Add Network Performance Monitoring solution
+4. Enable Update Management on VMs
+5. Enable Change Tracking on VMs
+6. Activity Log to Log Analytics Workspace  
+7. Enable NSG Flow logs & Traffic Analytics
+8. Add Network Performance Monitoring solution
 
 #### Connect all VMs to Log Analytics Workspace through
 * Azure Portal  
@@ -18,9 +19,13 @@
 
 #### Enable Azure Monitor for VM  
 <img src="Setuplog-EnableMonitorForVM.png" width="550" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+
+#### Enable Update Management on VMs
+[See docs](https://docs.microsoft.com/en-us/azure/automation/update-management/enable-from-vm)
    
-#### Enable Change Tracking  
-<img src="Setuplog-EnableChangeTracking.png" width="450" height="300" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+#### Enable Change Tracking on VMs  
+[See docs](https://docs.microsoft.com/en-us/azure/automation/change-tracking/enable-from-vm)
+<img src="Setuplog-EnableChangeTracking.png" width="450" height="300" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />  
    
 #### Activity Log to Log Analytics Workspace  
 [Activity Log Categories](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/activity-log-schema#categories)
