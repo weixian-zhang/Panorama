@@ -16,7 +16,6 @@ AzureActivity
     isnotempty(Rules) and array_length(Rules) > 0 and
     CategoryValue  == "Administrative" and
     ActivityStatusValue in ("Started", "Success") and
-    isempty(OperationName) == false and
     ActionType in ("ACTION", "WRITE", "DELETE") and
     toupper(OperationNameValue) startswith toupper("Microsoft.Network/networkSecurityGroups") and //group only, no rules
     OperationNameValue !has "securityRules" and
@@ -102,7 +101,6 @@ let NSGRulesNotGroup =
         | where
             CategoryValue  == "Administrative" and
             ActivityStatusValue in ("Started", "Success") and
-            isempty(OperationName) == false and
             ActionType in ("ACTION", "WRITE", "DELETE") and
             OperationNameValue has "securityRules" and //*only rules, union security group above
             ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
