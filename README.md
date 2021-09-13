@@ -60,7 +60,8 @@ This workbook contains 5 tabs:
 * Change Tracking: Showcase 5 areas of changes: File, Windows Services, Linux Daemons, Software and Registry
 
 ### Firewall Insights Workbook  
-This workbook categorizes traffics that are processed by Azure Firewall into 4 tabs filtered views of: Threat Intelligence, NAT, Network and Application FQDNs  
+Use official [Azure Monitor Workbook For Firewall](https://github.com/Azure/Azure-Network-Security/tree/master/Azure%20Firewall/Workbook%20-%20Azure%20Firewall%20Monitor%20Workbook) instead.  
+*Firewall Insights is obsolete
 
 ### Log Analytics Insights Workbook  
 It operates 1 workspace at a time, contains a view of ingested logs in GB grouped by Monitoring Solution, and Kubernetes specific logs collection by enabling ContainerInsignts.  
