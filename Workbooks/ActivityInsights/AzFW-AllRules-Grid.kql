@@ -11,7 +11,6 @@ let AzFWActivities = AzureActivity
 | where
     CategoryValue  == "Administrative" and
     ActivityStatusValue in ("Started", "Success") and
-    isempty(OperationName) == false and
     toupper(OperationNameValue) startswith toupper("Microsoft.Network/azureFirewalls") and
     ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
     TimeGenerated > ago(200d)
