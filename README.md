@@ -27,7 +27,6 @@ Panorama consists of the following artifacts:
 * Workbooks  
    * [Activity Insights](#activity-insights-workbook)
    * [IaaS Insights](#iaas-insights-workbook)
-   * [Firewall Insights](#firewall-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
    * [Traffic Search](#traffic-search)
 * Dashboard
