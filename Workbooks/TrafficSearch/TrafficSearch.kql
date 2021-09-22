@@ -17,89 +17,65 @@ AzureNetworkAnalytics_CL
 | extend NoOfDeniedOutboundFlow = DeniedOutFlows_d
 | extend SrcPublicIpSplitted = split(SrcPublicIPs_s, " ")//data:104.105.88.184|126|0|0|0|0|0 104.126.188.73|55|0|0|0|0|0 104.93.64.138|315|0|0|0|0|0
 //apply subquery to array in this case (also on table)
-| mv-apply stringPipe = SrcPublicIpSplitted to typeof(string) on 
+| mv-apply stringPipe = SrcPublicIpSplitted to typeof(string) on
     (
        project SrcPublicIps = strcat(tostring(split(stringPipe, "|")[0]), ", ")
     )
-
 | extend DestPublicIpSplitted = split(DestPublicIPs_s, " ")//data:104.105.88.184|126|0|0|0|0|0 104.126.188.73|55|0|0|0|0|0 104.93.64.138|315|0|0|0|0|0
 //apply subquery to array in this case (also on table)
 | mv-apply stringPipe = DestPublicIpSplitted to typeof(string) on //apply subquery to array in this case (also on table)
     (
        project DestPublicIps = strcat(tostring(split(stringPipe, "|")[0]), ", ")
     )
-| where SubType_s == "FlowLog" and TimeGenerated > ago(2d) 
-| join kind=leftouter (
-    NetworkMonitoring
-    | extend Latency = HighLatency
-    | extend PacketLossPercent = Loss
-    | extend PathArrow = replace(" ", " -> ", Path)
-    | extend TrafficPath = replace(@'\*', "nva", PathArrow)
-    | extend LossHealth = LossHealthState
-    | extend LatencyHealth = LatencyHealthState
-    | where TimeGenerated > ago(2d)
-    | summarize Latency = max(HighLatency), PacketLossPercent = max(Loss) by 
-        SourceNetworkNodeInterface, DestinationNetworkNodeInterface, TrafficPath, LossHealth, LatencyHealth
-    )
-    on $left.SrcIP_s == $right.SourceNetworkNodeInterface and $left.DestIP_s == $right.DestinationNetworkNodeInterface
-| where 
-   (FlowType_s == "{FlowType}" and 
+| where SubType_s == "FlowLog" and TimeGenerated {TimeRange}
+| where
+   (FlowType_s == "{FlowType}" and
    FlowStatus_s in ({NSGAccess}) ) and
    FlowDirection_s in ({Direction})
 
    {KqlWhereSrcVMName} //from hidden param
    {KqlWhereDestVMName} //from hidden param
-| distinct 
+| distinct
     TimeGenerated,
-    FlowType, 
-    NSG, 
+    FlowType,
+    NSG,
     NSGRule,
     FlowDirection,
     NSGAccess,
     SrcSubnet,
-    SrcVMName, 
-    SrcIP_s, 
-    SrcPublicIps, 
+    SrcVMName,
+    SrcIP_s,
+    SrcPublicIps,
     DestSubnet,
-    DestVMName, 
-    DestIP_s, 
-    DestPublicIps, 
-    DestPort, 
-    L4Protocol, 
-    L7Protocol, 
-    TrafficPath,
-    LossHealth,
-    LatencyHealth,
-    Latency, 
-    PacketLossPercent, 
-    NoOfAllowedInboundFlow, 
-    NoOfAllowedOutboundFlow, 
-    NoOfDeniedInboundFlow, 
+    DestVMName,
+    DestIP_s,
+    DestPublicIps,
+    DestPort,
+    L4Protocol,
+    L7Protocol,
+    NoOfAllowedInboundFlow,
+    NoOfAllowedOutboundFlow,
+    NoOfDeniedInboundFlow,
     NoOfDeniedOutboundFlow
-| project 
+| project
     ["Time(UTC+8)"] = datetime_add('hour',8,TimeGenerated),
-    ["Flow Type"] = FlowType, 
-    ["NSG"] = NSG, 
-    ["NSG Rule"] = NSGRule, 
+    ["Flow Type"] = FlowType,
+    ["NSG"] = NSG,
+    ["NSG Rule"] = NSGRule,
     ["Allow / Deny"] = NSGAccess,
     ["Flow Direction"] = FlowDirection,
     ["Src Subnet"] = SrcSubnet,
-    ["Src VM"] = iif(SrcVMName == "unknown-vm", "unknown/PaaS", SrcVMName) , 
-    ["Src VM IP"] = SrcIP_s, 
-    ["Src VM Public IP"] = replace("168.63.129.16", "Azure WireServer", SrcPublicIps), 
+    ["Src VM"] = iif(SrcVMName == "unknown-vm", "unknown/PaaS", SrcVMName) ,
+    ["Src VM IP"] = SrcIP_s,
+    ["Src VM Public IP"] = replace("168.63.129.16", "Azure WireServer", SrcPublicIps),
     ["Dest Subnet"] = DestSubnet,
-    ["Dest VM"] = iif(DestVMName == "unknown-vm", "unknown/PaaS", DestVMName), 
-    ["Dest VM IP"] = DestIP_s, 
-    ["Dest VM Public IP"] = replace("168.63.129.16", "Azure WireServer", DestPublicIps), 
-    DestPort, 
-    L4Protocol, 
+    ["Dest VM"] = iif(DestVMName == "unknown-vm", "unknown/PaaS", DestVMName),
+    ["Dest VM IP"] = DestIP_s,
+    ["Dest VM Public IP"] = replace("168.63.129.16", "Azure WireServer", DestPublicIps),
+    DestPort,
+    L4Protocol,
     L7Protocol,
-    ["Traffic Path (NPM)"] = iif(Latency == -1 or isempty(tostring(TrafficPath)), "not found", tostring(TrafficPath)),
-    ["Loss Health (NPM)"] = iif(Latency == -1 or isempty(tostring(LossHealth)), "not found", tostring(LossHealth)),
-    ["Latency Health (NPM)"] = iif(Latency == -1 or isempty(tostring(LatencyHealth)), "not found", tostring(LatencyHealth)),
-    ["Latency (NPM)"] = iif(Latency == -1 or isempty(tostring(Latency)), "not found", strcat(tostring(round(Latency,1)),"ms")), 
-    ["Packet Loss % (NPM)"] = iif(Latency == -1 or isempty(tostring(Latency)) == "-1" or isempty(tostring(PacketLossPercent)), "not found", strcat(tostring(PacketLossPercent),"%")), 
-    NoOfAllowedInboundFlow, 
-    NoOfAllowedOutboundFlow, 
-    NoOfDeniedInboundFlow, 
+    NoOfAllowedInboundFlow,
+    NoOfAllowedOutboundFlow,
+    NoOfDeniedInboundFlow,
     NoOfDeniedOutboundFlow

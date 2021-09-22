@@ -1,3 +1,4 @@
+//obsolete - change to Firewall Manager Policy and Activity Log no longer shown exact rule change
 
 AzureActivity
 | extend LocalTime = datetime_add('hour',8, TimeGenerated)
@@ -24,7 +25,7 @@ AzureActivity
 //| extend NetRules = RequestBody["networkRuleCollections"]
 | where
 
-    CorrelationId == "{CorrelationId}" and 
+    CorrelationId == "{CorrelationId}" and
     _ResourceId == "{ResourceId}" and
     CategoryValue  == "Administrative" and
     ActivityStatusValue == "Started" //and //select only 1 entry of the same activity

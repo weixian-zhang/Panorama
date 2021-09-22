@@ -55,8 +55,7 @@
             "type": 4,
             "isRequired": true,
             "value": {
-              "durationMs": 3600000,
-              "endTime": "2020-11-17T13:00:00.000Z"
+              "durationMs": 14400000
             },
             "typeSettings": {
               "selectableValues": [
@@ -137,7 +136,9 @@
             "crossComponentResources": [
               "{Subscription}"
             ],
-            "value": [],
+            "value": [
+              "value::all"
+            ],
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -163,7 +164,9 @@
             "crossComponentResources": [
               "{Subscription}"
             ],
-            "value": [],
+            "value": [
+              "value::all"
+            ],
             "typeSettings": {
               "additionalResourceOptions": [
                 "value::all"
@@ -253,7 +256,7 @@
         ],
         "style": "above",
         "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces"
+        "resourceType": "microsoft.resourcegraph/resources"
       },
       "name": "parameters - 2"
     },
@@ -270,12 +273,12 @@
             "type": 2,
             "description": "Types of flow, Intra-VNet, Inter Peered VNets, External Public IP, Azure-owned Public IP or Azure controlplane Public IPs",
             "isRequired": true,
-            "value": "ExternalPublic",
+            "value": "InterVNet",
             "typeSettings": {
               "additionalResourceOptions": [],
               "showDefault": false
             },
-            "jsonData": "[\r\n    {\r\n        \"value\": \"IntraVNet\",\r\n        \"label\": \"Traffic to/from same VNet\"\r\n    },\r\n    {\r\n        \"value\": \"InterVNet\",\r\n        \"label\": \"Traffic to/from peered VNets\"\r\n    },\r\n    {\r\n        \"value\": \"ExternalPublic\",\r\n        \"label\": \"Traffic to/from External Public IPs (non-Azure)\"\r\n    },\r\n    {\r\n        \"value\": \"AzurePublic\",\r\n        \"label\": \"Traffic to/from Azure-owned Public IPs\"\r\n    }\r\n]",
+            "jsonData": "[\r\n    {\r\n        \"value\": \"IntraVNet\",\r\n        \"label\": \"Intra VNet\"\r\n    },\r\n    {\r\n        \"value\": \"InterVNet\",\r\n        \"label\": \"Inter VNet\"\r\n    },\r\n    {\r\n        \"value\": \"ExternalPublic\",\r\n        \"label\": \"Traffic between External Public IPs (non-Azure)\"\r\n    },\r\n    {\r\n        \"value\": \"AzurePublic\",\r\n        \"label\": \"Traffic between Azure Public IPs\"\r\n    }\r\n]",
             "timeContext": {
               "durationMs": 86400000
             }
@@ -341,12 +344,11 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "AzureNetworkAnalytics_CL\r\n| extend FlowType = FlowType_s\r\n| extend FlowDirection = iif(FlowDirection_s == \"I\",\"Inbound\", \"Outbound\")\r\n| extend NSGAccess = iif(FlowStatus_s == \"A\", \"Allow\", \"Deny\")\r\n| extend SrcSubnet = Subnet1_s //source vm subnet\r\n| extend SrcVMName = tostring(split(VM1_s, \"/\")[1])  //src VM name\r\n| extend DestSubnet = Subnet2_s //dest vm subnet\r\n| extend DestVMName = tostring(split(VM2_s, \"/\")[1]) //dest VM vm name\r\n| extend DestPort = DestPort_d\r\n| extend L4Protocol = iif(L4Protocol_s == \"T\", \"TCP\", \"UDP\")\r\n| extend L7Protocol = L7Protocol_s\r\n| extend NSG = tostring(split(NSGList_s, \"/\")[2])\r\n| extend NSGRule = NSGRule_s\r\n| extend NoOfAllowedInboundFlow = AllowedInFlows_d\r\n| extend NoOfAllowedOutboundFlow = AllowedOutFlows_d\r\n| extend NoOfDeniedInboundFlow = DeniedInFlows_d\r\n| extend NoOfDeniedOutboundFlow = DeniedOutFlows_d\r\n| extend SrcPublicIpSplitted = split(SrcPublicIPs_s, \" \")//data:104.105.88.184|126|0|0|0|0|0 104.126.188.73|55|0|0|0|0|0 104.93.64.138|315|0|0|0|0|0\r\n//apply subquery to array in this case (also on table)\r\n| mv-apply stringPipe = SrcPublicIpSplitted to typeof(string) on \r\n    (\r\n       project SrcPublicIps = strcat(tostring(split(stringPipe, \"|\")[0]), \", \")\r\n    )\r\n\r\n| extend DestPublicIpSplitted = split(DestPublicIPs_s, \" \")//data:104.105.88.184|126|0|0|0|0|0 104.126.188.73|55|0|0|0|0|0 104.93.64.138|315|0|0|0|0|0\r\n//apply subquery to array in this case (also on table)\r\n| mv-apply stringPipe = DestPublicIpSplitted to typeof(string) on //apply subquery to array in this case (also on table)\r\n    (\r\n       project DestPublicIps = strcat(tostring(split(stringPipe, \"|\")[0]), \", \")\r\n    )\r\n| where SubType_s == \"FlowLog\" and TimeGenerated > ago(2d) \r\n| join kind=leftouter (\r\n    NetworkMonitoring\r\n    | extend Latency = HighLatency\r\n    | extend PacketLossPercent = Loss\r\n    | extend PathArrow = replace(\" \", \" -> \", Path)\r\n    | extend TrafficPath = replace(@'\\*', \"nva\", PathArrow)\r\n    | extend LossHealth = LossHealthState\r\n    | extend LatencyHealth = LatencyHealthState\r\n    | where TimeGenerated > ago(2d)\r\n    | summarize Latency = max(HighLatency), PacketLossPercent = max(Loss) by \r\n        SourceNetworkNodeInterface, DestinationNetworkNodeInterface, TrafficPath, LossHealth, LatencyHealth\r\n    )\r\n    on $left.SrcIP_s == $right.SourceNetworkNodeInterface and $left.DestIP_s == $right.DestinationNetworkNodeInterface\r\n| where \r\n   (FlowType_s == \"{FlowType}\" and \r\n   FlowStatus_s in ({NSGAccess}) ) and\r\n   FlowDirection_s in ({Direction})\r\n\r\n   {KqlWhereSrcVMName} //from hidden param\r\n   {KqlWhereDestVMName} //from hidden param\r\n| distinct \r\n    TimeGenerated,\r\n    FlowType, \r\n    NSG, \r\n    NSGRule,\r\n    FlowDirection,\r\n    NSGAccess,\r\n    SrcSubnet,\r\n    SrcVMName, \r\n    SrcIP_s, \r\n    SrcPublicIps, \r\n    DestSubnet,\r\n    DestVMName, \r\n    DestIP_s, \r\n    DestPublicIps, \r\n    DestPort, \r\n    L4Protocol, \r\n    L7Protocol, \r\n    TrafficPath,\r\n    LossHealth,\r\n    LatencyHealth,\r\n    Latency, \r\n    PacketLossPercent, \r\n    NoOfAllowedInboundFlow, \r\n    NoOfAllowedOutboundFlow, \r\n    NoOfDeniedInboundFlow, \r\n    NoOfDeniedOutboundFlow\r\n| project \r\n    [\"Time(UTC+8)\"] = datetime_add('hour',8,TimeGenerated),\r\n    [\"Flow Type\"] = FlowType, \r\n    [\"NSG\"] = NSG, \r\n    [\"NSG Rule\"] = NSGRule, \r\n    [\"Allow / Deny\"] = NSGAccess,\r\n    [\"Flow Direction\"] = FlowDirection,\r\n    [\"Src Subnet\"] = SrcSubnet,\r\n    [\"Src VM\"] = iif(SrcVMName == \"unknown-vm\", \"unknown/PaaS\", SrcVMName) , \r\n    [\"Src VM IP\"] = SrcIP_s, \r\n    [\"Src VM Public IP\"] = replace(\"168.63.129.16\", \"Azure WireServer\", SrcPublicIps), \r\n    [\"Dest Subnet\"] = DestSubnet,\r\n    [\"Dest VM\"] = iif(DestVMName == \"unknown-vm\", \"unknown/PaaS\", DestVMName), \r\n    [\"Dest VM IP\"] = DestIP_s, \r\n    [\"Dest VM Public IP\"] = replace(\"168.63.129.16\", \"Azure WireServer\", DestPublicIps), \r\n    DestPort, \r\n    L4Protocol, \r\n    L7Protocol,\r\n    [\"Traffic Path (NPM)\"] = iif(Latency == -1 or isempty(tostring(TrafficPath)), \"not found\", tostring(TrafficPath)),\r\n    [\"Loss Health (NPM)\"] = iif(Latency == -1 or isempty(tostring(LossHealth)), \"not found\", tostring(LossHealth)),\r\n    [\"Latency Health (NPM)\"] = iif(Latency == -1 or isempty(tostring(LatencyHealth)), \"not found\", tostring(LatencyHealth)),\r\n    [\"Latency (NPM)\"] = iif(Latency == -1 or isempty(tostring(Latency)), \"not found\", strcat(tostring(round(Latency,1)),\"ms\")), \r\n    [\"Packet Loss % (NPM)\"] = iif(Latency == -1 or isempty(tostring(Latency)) == \"-1\" or isempty(tostring(PacketLossPercent)), \"not found\", strcat(tostring(PacketLossPercent),\"%\")), \r\n    NoOfAllowedInboundFlow, \r\n    NoOfAllowedOutboundFlow, \r\n    NoOfDeniedInboundFlow, \r\n    NoOfDeniedOutboundFlow",
+        "query": "AzureNetworkAnalytics_CL\r\n| extend FlowType = FlowType_s\r\n| extend FlowDirection = iif(FlowDirection_s == \"I\",\"Inbound\", \"Outbound\")\r\n| extend NSGAccess = iif(FlowStatus_s == \"A\", \"Allow\", \"Deny\")\r\n| extend SrcSubnet = Subnet1_s //source vm subnet\r\n| extend SrcVMName = tostring(split(VM1_s, \"/\")[1])  //src VM name\r\n| extend DestSubnet = Subnet2_s //dest vm subnet\r\n| extend DestVMName = tostring(split(VM2_s, \"/\")[1]) //dest VM vm name\r\n| extend DestPort = DestPort_d\r\n| extend L4Protocol = iif(L4Protocol_s == \"T\", \"TCP\", \"UDP\")\r\n| extend L7Protocol = L7Protocol_s\r\n| extend NSG = tostring(split(NSGList_s, \"/\")[2])\r\n| extend NSGRule = NSGRule_s\r\n| extend NoOfAllowedInboundFlow = AllowedInFlows_d\r\n| extend NoOfAllowedOutboundFlow = AllowedOutFlows_d\r\n| extend NoOfDeniedInboundFlow = DeniedInFlows_d\r\n| extend NoOfDeniedOutboundFlow = DeniedOutFlows_d\r\n| extend SrcPublicIpSplitted = split(SrcPublicIPs_s, \" \")//data:104.105.88.184|126|0|0|0|0|0 104.126.188.73|55|0|0|0|0|0 104.93.64.138|315|0|0|0|0|0\r\n//apply subquery to array in this case (also on table)\r\n| mv-apply stringPipe = SrcPublicIpSplitted to typeof(string) on \r\n    (\r\n       project SrcPublicIps = strcat(tostring(split(stringPipe, \"|\")[0]), \", \")\r\n    )\r\n| extend DestPublicIpSplitted = split(DestPublicIPs_s, \" \")//data:104.105.88.184|126|0|0|0|0|0 104.126.188.73|55|0|0|0|0|0 104.93.64.138|315|0|0|0|0|0\r\n//apply subquery to array in this case (also on table)\r\n| mv-apply stringPipe = DestPublicIpSplitted to typeof(string) on //apply subquery to array in this case (also on table)\r\n    (\r\n       project DestPublicIps = strcat(tostring(split(stringPipe, \"|\")[0]), \", \")\r\n    )\r\n| where SubType_s == \"FlowLog\" and TimeGenerated {TimeRange}\r\n| where \r\n   (FlowType_s == \"{FlowType}\" and \r\n   FlowStatus_s in ({NSGAccess}) ) and\r\n   FlowDirection_s in ({Direction})\r\n\r\n   {KqlWhereSrcVMName} //from hidden param\r\n   {KqlWhereDestVMName} //from hidden param\r\n| distinct \r\n    TimeGenerated,\r\n    FlowType, \r\n    NSG, \r\n    NSGRule,\r\n    FlowDirection,\r\n    NSGAccess,\r\n    SrcSubnet,\r\n    SrcVMName, \r\n    SrcIP_s, \r\n    SrcPublicIps, \r\n    DestSubnet,\r\n    DestVMName, \r\n    DestIP_s, \r\n    DestPublicIps, \r\n    DestPort, \r\n    L4Protocol, \r\n    L7Protocol, \r\n    NoOfAllowedInboundFlow, \r\n    NoOfAllowedOutboundFlow, \r\n    NoOfDeniedInboundFlow, \r\n    NoOfDeniedOutboundFlow\r\n| project \r\n    [\"Time(UTC+8)\"] = datetime_add('hour',8,TimeGenerated),\r\n    [\"Flow Type\"] = FlowType, \r\n    [\"NSG\"] = NSG, \r\n    [\"NSG Rule\"] = NSGRule, \r\n    [\"Allow / Deny\"] = NSGAccess,\r\n    [\"Flow Direction\"] = FlowDirection,\r\n    [\"Src Subnet\"] = SrcSubnet,\r\n    [\"Src VM\"] = iif(SrcVMName == \"unknown-vm\", \"unknown/PaaS\", SrcVMName) , \r\n    [\"Src VM IP\"] = SrcIP_s, \r\n    [\"Src VM Public IP\"] = replace(\"168.63.129.16\", \"Azure WireServer\", SrcPublicIps), \r\n    [\"Dest Subnet\"] = DestSubnet,\r\n    [\"Dest VM\"] = iif(DestVMName == \"unknown-vm\", \"unknown/PaaS\", DestVMName), \r\n    [\"Dest VM IP\"] = DestIP_s, \r\n    [\"Dest VM Public IP\"] = replace(\"168.63.129.16\", \"Azure WireServer\", DestPublicIps), \r\n    DestPort, \r\n    L4Protocol, \r\n    L7Protocol,\r\n    NoOfAllowedInboundFlow, \r\n    NoOfAllowedOutboundFlow, \r\n    NoOfDeniedInboundFlow, \r\n    NoOfDeniedOutboundFlow",
         "size": 0,
         "noDataMessage": "No traffic found from parameter filters",
         "timeContext": {
-          "durationMs": 3600000,
-          "endTime": "2020-11-17T13:00:00.000Z"
+          "durationMs": 0
         },
         "timeContextFromParameter": "TimeRange",
         "exportedParameters": [
@@ -720,21 +722,6 @@
             },
             {
               "columnId": "L7Protocol"
-            },
-            {
-              "columnId": "Traffic Path (NPM)"
-            },
-            {
-              "columnId": "Loss Health (NPM)"
-            },
-            {
-              "columnId": "Latency Health (NPM)"
-            },
-            {
-              "columnId": "Latency (NPM)"
-            },
-            {
-              "columnId": "Packet Loss % (NPM)"
             },
             {
               "columnId": "NoOfAllowedInboundFlow",

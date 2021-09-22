@@ -1,10 +1,9 @@
 AzureActivity
 | extend ResourceCategory = parse_json(Properties).resourceProviderValue
 | where
-    CategoryValue  == "Administrative" and
-    ActivityStatusValue in ("Success", "Succeeded") and
-    isempty(OperationName) == false and
-    toupper(OperationNameValue) startswith toupper("Microsoft.Network/azureFirewalls") and
-    ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
-    TimeGenerated > ago(2d)
+        CategoryValue == "Administrative" and
+        ActivityStatusValue in ("Started", "Success") and
+        toupper(OperationNameValue) startswith toupper("Microsoft.Network/firewallPolicies") and //azfw policies
+        ResourceCategory !in ("MICROSOFT.RESOURCEHEALTH", "MICROSOFT.RESOURCES") and
+        TimeGenerated {TimeRange}
 | summarize dcount(CorrelationId) by ResourceGroup
