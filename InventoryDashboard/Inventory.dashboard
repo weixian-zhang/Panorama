@@ -1036,11 +1036,11 @@
       }
     }
   },
-  "name": "Inventory (2)",
+  "name": "Inventory",
   "type": "Microsoft.Portal/dashboards",
-  "location": "INSERT LOCATION",
+  "location": "SoutheastAsia",
   "tags": {
-    "hidden-title": "Inventory (2)"
+    "hidden-title": "Inventory"
   },
   "apiVersion": "2015-08-01-preview"
 }
