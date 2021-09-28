@@ -7,7 +7,6 @@
 5. [Enable Inventory & Change Tracking](#enable-inventory--change-tracking)
 6. [Activity Log to Log Analytics Workspace](#activity-log-to-log-analytics-workspace)
 7. [Enable NSG Flow logs & Traffic Analytics](#nsg-flow-logs--traffic-analytics)
-8. [Add Network Performance Monitoring solution](#network-performance-monitor-solution)
 
 ####  Connect VMs to Log Analytics
 * Azure Portal  
@@ -42,6 +41,3 @@ Select NSG with Disabled status and select
    * select a storage account to keep the raw logs
    * Go to Traffic Analytics status switch to "On" to enable Traffic Analytics
    * select Log Analytics to store aggregated logs of Traffic Analytics
-
-#### Network Performance Monitor solution  
-Follow [this doc](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/network-performance-monitor) to setup NPM
