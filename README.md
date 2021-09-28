@@ -27,7 +27,6 @@ Panorama consists of the following artifacts:
 * Workbooks  
    * [Activity Insights](#activity-insights-workbook)
    * [IaaS Insights](#iaas-insights-workbook)
-   * [Firewall Insights](#firewall-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
    * [Traffic Search](#traffic-search)
 * Dashboard
@@ -39,7 +38,7 @@ Panorama consists of the following artifacts:
 3. Follow by clicking Code icon "</>"  
 4. Under **Gallery Template**, delete existing Json and paste in IaaSInsights Workbook Json content and hit "Apply"
    <img src="./docs/setup-workbook-1.png" width="450" height="250" align="left" />  
-   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+   <img src="./docs/setup-workbook-2.png" width="450" height="250" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
 ### Setup a Dashboard  
 1. Save [Inventory Dashboard](https://github.com/weixian-zhang/Panorama/blob/master/InventoryDashboard/Inventory.dashboard) as .json file on your machine.  
@@ -60,7 +59,8 @@ This workbook contains 5 tabs:
 * Change Tracking: Showcase 5 areas of changes: File, Windows Services, Linux Daemons, Software and Registry
 
 ### Firewall Insights Workbook  
-This workbook categorizes traffics that are processed by Azure Firewall into 4 tabs filtered views of: Threat Intelligence, NAT, Network and Application FQDNs  
+Use official [Azure Monitor Workbook For Firewall](https://github.com/Azure/Azure-Network-Security/tree/master/Azure%20Firewall/Workbook%20-%20Azure%20Firewall%20Monitor%20Workbook) instead.  
+*Firewall Insights is obsolete
 
 ### Log Analytics Insights Workbook  
 It operates 1 workspace at a time, contains a view of ingested logs in GB grouped by Monitoring Solution, and Kubernetes specific logs collection by enabling ContainerInsignts.  
