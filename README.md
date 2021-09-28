@@ -29,6 +29,7 @@ Panorama consists of the following artifacts:
    * [IaaS Insights](#iaas-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
    * [Traffic Search](#traffic-search)
+   * Key Vault Audit Insights
 * Dashboard
    * [Inventory Dashboard](#inventory-dashboard)  
 
