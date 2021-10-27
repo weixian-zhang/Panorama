@@ -1,0 +1,189 @@
+
+
+let nsgFlowTable = AzureNetworkAnalytics_CL
+| extend FlowType = FlowType_s
+| extend FlowDirection = iif(FlowDirection_s == "I","Inbound", "Outbound")
+| extend NSGAccess = iif(FlowStatus_s == "A", "Allow", "Deny")
+| extend SrcSubnet = Subnet1_s //source vm subnet
+| extend SrcVMName = tostring(split(VM1_s, "/")[1])  //src VM name
+| extend DestSubnet = Subnet2_s //dest vm subnet
+| extend DestVMName = tostring(split(VM2_s, "/")[1]) //dest VM vm name
+| extend DestPort = DestPort_d
+| extend L4Protocol = iif(L4Protocol_s == "T", "TCP", "UDP")
+| extend L7Protocol = L7Protocol_s
+| extend NSG = tostring(split(NSGList_s, "/")[2])
+| extend NSGRule = NSGRule_s
+| extend NoOfAllowedInboundFlow = AllowedInFlows_d
+| extend NoOfAllowedOutboundFlow = AllowedOutFlows_d
+| extend NoOfDeniedInboundFlow = DeniedInFlows_d
+| extend NoOfDeniedOutboundFlow = DeniedOutFlows_d
+| extend SrcPublicIpSplitted = split(SrcPublicIPs_s, " ")//data:104.105.88.184|126|0|0|0|0|0 104.126.188.73|55|0|0|0|0|0 104.93.64.138|315|0|0|0|0|0
+//apply subquery to array in this case (also on table)
+| mv-apply stringPipe = SrcPublicIpSplitted to typeof(string) on
+    (
+       project SrcPublicIps = strcat(tostring(split(stringPipe, "|")[0]), ", ")
+    )
+| extend DestPublicIpSplitted = split(DestPublicIPs_s, " ")//data:104.105.88.184|126|0|0|0|0|0 104.126.188.73|55|0|0|0|0|0 104.93.64.138|315|0|0|0|0|0
+//apply subquery to array in this case (also on table)
+| mv-apply stringPipe = DestPublicIpSplitted to typeof(string) on //apply subquery to array in this case (also on table)
+    (
+       project DestPublicIps = strcat(tostring(split(stringPipe, "|")[0]), ", ")
+    )
+| where SubType_s == "FlowLog" and TimeGenerated > ago(48h)
+| distinct
+    TimeGenerated,
+    FlowType,
+    NSG,
+    NSGRule,
+    FlowDirection,
+    NSGAccess,
+    SrcSubnet,
+    SrcVMName,
+    SrcIP_s,
+    SrcPublicIps,
+    DestSubnet,
+    DestVMName,
+    DestIP_s,
+    DestPublicIps,
+    DestPort,
+    L4Protocol,
+    L7Protocol,
+    NoOfAllowedInboundFlow,
+    NoOfAllowedOutboundFlow,
+    NoOfDeniedInboundFlow,
+    NoOfDeniedOutboundFlow
+| project
+    SingTimeGenerated = datetime_add('hour',8,TimeGenerated),
+    FlowType,
+    //["Flow Type"] = FlowType,
+    NSG,
+    NSGRule,
+    NSGAccess,
+    FlowDirection,
+    SrcSubnet,
+    SrcVMName = iif(SrcVMName == "unknown-vm", "unknown/PaaS", SrcVMName),
+    SrcIP_s,
+    SrcVMPublicIP = replace("168.63.129.16", "Azure WireServer", SrcPublicIps),
+    DestSubnet = DestSubnet,
+    DestVMName = iif(DestVMName == "unknown-vm", "unknown/PaaS", DestVMName),
+    DestIP_s,
+    DestVMPublicIP = replace("168.63.129.16", "Azure WireServer", DestPublicIps),
+    DestPort,
+    L4Protocol,
+    L7Protocol,
+    NoOfAllowedInboundFlow,
+    NoOfAllowedOutboundFlow,
+    NoOfDeniedInboundFlow,
+    NoOfDeniedOutboundFlow;
+
+
+//AzFW az-diag table
+let azfwTable = AzureDiagnostics
+        | parse msg_s with Protocol " request from " SourceIP ":" Port:int " " TempDetails ". Action: " Action ". " RestOfMsg
+        | parse TempDetails with "to " Dest ":" DestPort:int
+        | where Category in ("AzureFirewallApplicationRule", "AzureFirewallNetworkRule")
+        | where TimeGenerated > ago(48h)
+        | join kind=leftouter (AzureNetworkAnalyticsIPDetails_CL) on $left.Dest == $right.IP_s
+        | project Dest, FirewallCategory = Category, FirewallSourceIP = SourceIP, FirewallDest = Dest, DomainWHOIS= PublicIPDetails_s, FirewallAction = Action, FirewallMsg = msg_s;
+
+
+let nsgSrcAzFWJoin = nsgFlowTable
+| join kind=leftouter (azfwTable) on $left.SrcIP_s == $right.FirewallSourceIP;
+
+let nsgDestAzFWJoin = nsgFlowTable
+| join kind=leftouter (azfwTable) on $left.DestIP_s == $right.FirewallSourceIP;
+
+//union of nsgFlow + AzDiag-AzFW where join condition is nsgFlow.SourceIP or nsgFlow.DestIP
+//as join cannot have OR operator only AND
+nsgSrcAzFWJoin
+    | union nsgDestAzFWJoin
+    | where SingTimeGenerated > ago(24h)
+    | where DestIP_s == "172.17.0.5" and FirewallDest != ""
+    // | distinct
+    //     SingTimeGenerated,
+    //     FlowType,
+    //     NSG,
+    //     NSGRule,
+    //     NSGAccess,
+    //     FlowDirection,
+    //     SrcSubnet,
+    //     SrcVMName,
+    //     SrcIP_s,
+    //     SrcVMPublicIP,
+    //     DestSubnet,
+    //     DestVMName,
+    //     DestIP_s,
+    //     DestVMPublicIP,
+    //     DestPort,
+    //     L4Protocol,
+    //     L7Protocol,
+    //     FirewallCategory,
+    //     FirewallSourceIP,
+    //     FirewallDest,
+    //     DomainWHOIS,
+    //     FirewallAction,
+    //     FirewallMsg
+    | project
+        ["Time(UTC+8)"] = SingTimeGenerated,
+        ["NSG-FlowType"] = FlowType,
+        ["NSG-Name"] = NSG,
+        ["NSG Rule"] = NSGRule,
+        ["NSG-Allow/Deny"] = NSGAccess,
+        ["Flow Direction"] = FlowDirection,
+        ["Src Subnet"] = SrcSubnet,
+        ["Src VM"] = SrcVMName,
+        ["Src VM IP"] = SrcIP_s,
+        ["Src VM Public IP"] = SrcVMPublicIP,
+        ["Dest Subnet"] = DestSubnet,
+        ["Dest VM"] = DestVMName,
+        ["Dest VM IP"] = DestIP_s,
+        ["Dest Public IP"] = DestVMPublicIP,
+        ["Dest Port"] = DestPort,
+        ["NSG L4 Protocol"] = L4Protocol,
+        ["NSG L7 Protocol"] = L7Protocol,
+        ["AzFW-Category"] = FirewallCategory,
+        ["AzFW-SrcIP"] = FirewallSourceIP,
+        ["AzFW-Destinaton"] = FirewallDest,
+        DomainWHOIS,
+        ["AzFW-Allow/Deny"] = FirewallAction,
+        ["AzFW-Msg"] = FirewallMsg
+
+
+// nsgFlowTable
+// | join kind=leftouter (azfwTable) on $left.DestIP_s == $right.FirewallSourceIP
+// //| lookup kind=leftouter (azfwTable) on $left.DestIP_s == $right.FirewallSourceIP
+// | where SingTimeGenerated > ago(48h)
+// | where SrcIP_s == "172.17.0.5" or DestIP_s == "172.17.0.5"
+// | where FirewallCategory != ""
+// | project ["Time(UTC+8)"] = SingTimeGenerated,
+//     FlowType,
+//     ["NSG"] = NSG,
+//     ["NSG Rule"] = NSGRule,
+//     ["Allow / Deny"] = NSGAccess,
+//     ["Flow Direction"] = FlowDirection,
+//     ["Src Subnet"] = SrcSubnet,
+//     ["Src VM"] = SrcVMName,
+//     SrcIP_s,
+//     ["Src VM IP"] = SrcIP_s,
+//     ["Src VM Public IP"] = SrcVMPublicIP,
+//     ["Dest Subnet"] = DestSubnet,
+//     ["Dest VM"] = DestVMName,
+//     DestIP_s,
+//     ["Dest VM IP"] = DestIP_s,
+//     ["Dest VM Public IP"] = DestVMPublicIP,
+//     DestPort,
+//     L4Protocol,
+//     L7Protocol,
+//     FirewallCategory,
+//     FirewallSourceIP,
+//     FirewallDest,
+//     FirewallAction,
+//     FirewallMsg
+    // NoOfAllowedInboundFlow,
+    // NoOfAllowedOutboundFlow,
+    // NoOfDeniedInboundFlow,
+    // NoOfDeniedOutboundFlow
+
+
+
+
