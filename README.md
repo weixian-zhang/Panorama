@@ -28,7 +28,7 @@ Panorama consists of the following artifacts:
    * [Activity Insights](#activity-insights-workbook)
    * [IaaS Insights](#iaas-insights-workbook)
    * [LogAnalytics Insights](#log-analytics-insights-workbook)
-   * [Traffic Search](#traffic-search)
+   * [Traffic Insights](#traffic-insights)
    * Key Vault Audit Insights (coming soon...)
 * Dashboard
    * [Inventory Dashboard](#inventory-dashboard)
@@ -65,8 +65,8 @@ Use official [Azure Monitor Workbook For Firewall](https://github.com/Azure/Azur
 
 ### Log Analytics Insights Workbook
 It operates 1 workspace at a time, contains a view of ingested logs in GB grouped by Monitoring Solution, and Kubernetes specific logs collection by enabling ContainerInsignts.
-### Traffic Search
-Traffic Search allows you to filter by source and destination VMs, flow types like Intra-VNet, Inter-Peered-VNets, Azure-owned PIPs and external PIPs.
+### Traffic Insights
+Traffic Insights allows you to filter by source and destination VMs, flow types like Intra-VNet, Inter-Peered-VNets, Azure-owned PIPs and external PIPs.
 This gives you valuable network traffic insights to your environment.
 The data is based on "NetworkMonitoring" and "AzureNetworkAnalytics_CL" Log Analytics tables created when you enable Network Performance Monitoring and Traffic Analytics. See [Collect Log](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md).
 <img src="./docs/trafficsearch-1.png" width="800" height="500" align="left" /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
