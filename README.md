@@ -3,12 +3,12 @@
   The workbooks does not currently contain Location parameter, as workbooks and dashboard are built for the purpose of a local Goverment Commercial Cloud program where all resources are in Southeast Asia region.
 
 ### Content
-[What Panorama offers?](#what-panorama-offers)
-[Artifacts - Workbooks & Dasboard](#workbooks-and-dasboard)
-[How to setup a Workbook](#setup-a-workbook)
-[How to setup a Dashboard](#setup-a-dashboard)
-[Collect Logs](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)
-[Guide - Azure Network Monitoring Tools](#network-monitoring-guide)
+* [What Panorama offers?](#what-panorama-offers)
+* [Artifacts - Workbooks & Dasboard](#workbooks-and-dasboard)
+* [How to setup a Workbook](#setup-a-workbook)
+* [How to setup a Dashboard](#setup-a-dashboard)
+* [Collect Logs](https://github.com/weixian-zhang/Panorama/blob/master/docs/SetupLogCollection.md)
+* [Guide - Azure Network Monitoring Tools](#network-monitoring-guide)
 
 ### What Panorama Offers
 Panorama contains supplementry monitoring viewpoints in the form of Workbooks and Dashboard in addition to existing community and built-in Azure workbooks.
