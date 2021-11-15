@@ -1,0 +1,193 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "2754c07f-127a-4e87-bc75-a20070bd52d1",
+            "version": "KqlParameterItem/1.0",
+            "name": "KeyVault",
+            "label": "Key Vaults",
+            "type": 5,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "resources\r\n| where type == \"microsoft.keyvault/vaults\"\r\n| project label = id, value = id",
+            "crossComponentResources": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "44cdf021-ac0b-4a12-acbb-6b544ff7a0a6",
+            "version": "KqlParameterItem/1.0",
+            "name": "LAW",
+            "label": "Log Analytics Workspaces",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "where type =~ 'microsoft.operationalinsights/workspaces'\r\n| order by name asc\r\n| project value = id, label = id",
+            "crossComponentResources": [
+              "value::all"
+            ],
+            "value": [
+              "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.OperationalInsights/workspaces/laa-gccshol"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1"
+              ],
+              "showDefault": false
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "69466585-38d6-46e3-859e-48dab13b251b",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time Range",
+            "type": 4,
+            "isRequired": true,
+            "value": {
+              "durationMs": 86400000
+            },
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          }
+        ],
+        "style": "above",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "parameters - 0"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "7e109032-51ac-4d9d-a4b7-ef54eec625b8",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Secret",
+            "subTarget": "Secret",
+            "style": "link"
+          },
+          {
+            "id": "7af3c0ba-f92d-4b73-b17b-a3aff1f14fb0",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Key",
+            "subTarget": "Key",
+            "style": "link"
+          },
+          {
+            "id": "f6a9854d-2917-45af-a56c-026bf39d97dc",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Certificate",
+            "subTarget": "Certificate",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 1"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "// get secret name from e.g https://akv-gccs.vault.azure.net/secrets/test-secret/2f68da87d81746268619dcdbc92ba76c\r\n\r\nAzureDiagnostics\r\n| extend ResourceArray = split(id_s, '/')\r\n| extend SecondLastResourceElement = ResourceArray[array_length(ResourceArray) - 2]\r\n| extend ThirdLastResourceElement = ResourceArray[array_length(ResourceArray) - 3]\r\n| extend SecretName = iff(SecondLastResourceElement == \"secrets\", ResourceArray[array_length(ResourceArray) - 1], ResourceArray[array_length(ResourceArray) - 2])\r\n| extend SecretVersion= iff(ThirdLastResourceElement == \"secrets\", ResourceArray[array_length(ResourceArray) - 1], '')\r\n| extend Success = iff(httpStatusCode_d == '200', 'Success', 'Fail')\r\n| extend EventTime = datetime_add('hour', 8, TimeGenerated)\r\n| where Category  == \"AuditEvent\" and ResourceType  == \"VAULTS\"\r\n| where OperationName startswith \"Secret\"\r\n| where TimeGenerated {TimeRange}\r\n//| where ResourceId in ({KeyVault:name})\r\n| project\r\n    ['Key Vault'] = Resource,\r\n    ['EventTime(UTC+8)'] = EventTime,\r\n    SecretName,\r\n    SecretVersion,\r\n    OperationName,\r\n    UserName = identity_claim_upn_s,\r\n    ['Action Status'] = Success,\r\n    ErrorMessage = ResultDescription,\r\n    ['Caller IP'] = CallerIPAddress,\r\n    ['Caller Info'] = clientInfo_s",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{LAW}"
+        ],
+        "visualization": "table"
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "Secret"
+      },
+      "name": "Secret-Grid"
+    }
+  ],
+  "fallbackResourceIds": [
+    "azure monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
