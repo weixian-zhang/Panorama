@@ -1,0 +1,279 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscriptions}"
+        ],
+        "parameters": [
+          {
+            "id": "6f354cb8-3d91-4e59-82b9-da518dcbd74e",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscriptions",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "value": [
+              "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "includeAll": false,
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1"
+          },
+          {
+            "id": "980ec5da-f51e-473f-b556-102aa6b181a3",
+            "version": "KqlParameterItem/1.0",
+            "name": "LAWs",
+            "label": "Log Analytics Workspaces",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces'\r\n| order by name asc\r\n| project value = id, label = id",
+            "crossComponentResources": [
+              "{Subscriptions}"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::1",
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources",
+            "value": [
+              "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.OperationalInsights/workspaces/laa-gccshol"
+            ]
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "parameters - 1"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "4daaf2c7-0fa1-4e87-ba89-12cb40a086c2",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Web Apps",
+            "subTarget": "WebApp",
+            "style": "link"
+          },
+          {
+            "id": "02331b5d-4bf6-497e-ba15-2253d0cd18b0",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Others",
+            "subTarget": "Others",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 3"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "{\"version\":\"AzureHealthQuery/1.0\",\"queryType\":\"Detailed\"}",
+        "size": 0,
+        "title": "Web App Availability",
+        "queryType": 4,
+        "resourceType": "microsoft.web/sites",
+        "crossComponentResources": [
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-azworkbench-dev/providers/Microsoft.Web/sites/portal-azworkbench-dev",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-azworkbench-dev/providers/Microsoft.Web/sites/webapp-api-dev",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-azworkbench-dev/providers/Microsoft.Web/sites/webapp-api-prod",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-isazureip-dev/providers/Microsoft.Web/sites/func-azdcipfileloader-dev",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Web/sites/func-in-asev3",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Web/sites/webapp-asev3-internet",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Web/sites/webapp-todelete"
+        ],
+        "visualization": "graph",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "Availability state",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "Count",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        },
+        "graphSettings": {
+          "type": 2,
+          "topContent": {
+            "columnMatch": "Name",
+            "formatter": 13,
+            "formatOptions": {
+              "linkTarget": "Resource",
+              "showIcon": true
+            }
+          },
+          "centerContent": {
+            "columnMatch": "Availability state",
+            "formatter": 1,
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "style": "decimal",
+                "maximumFractionDigits": 2,
+                "maximumSignificantDigits": 3
+              }
+            }
+          },
+          "bottomContent": {
+            "columnMatch": "Summary"
+          },
+          "nodeIdField": "Availability state",
+          "graphOrientation": 3,
+          "showOrientationToggles": false,
+          "nodeSize": null,
+          "staticNodeSize": 100,
+          "colorSettings": {
+            "nodeColorField": "Availability state",
+            "type": 3,
+            "thresholdsGrid": [
+              {
+                "operator": "==",
+                "thresholdValue": "Available",
+                "representation": "greenDark"
+              },
+              {
+                "operator": "Default",
+                "thresholdValue": null,
+                "representation": "yellow"
+              }
+            ]
+          },
+          "hivesMargin": 5
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "WebApp"
+      },
+      "name": "query - 1"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "availabilityResults \r\n| where timestamp > ago(30m)\r\n| distinct name, location, duration",
+        "size": 0,
+        "title": "Application Insights Web Test",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components",
+        "crossComponentResources": [
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-azworkbench-dev/providers/microsoft.insights/components/appinsights-azworkbench-dev",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-azworkbench-dev/providers/microsoft.insights/components/appinsights-azworkbench-prod",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-IsAzureIP-dev/providers/microsoft.insights/components/appinsights-func-azdcipfileloader-dev",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-IsAzureIP-dev/providers/microsoft.insights/components/func-azdcipfileloader-dev",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rggccshol/providers/microsoft.insights/components/webapp-asev3-internet",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgML/providers/microsoft.insights/components/mlworkspacedp18723030776"
+        ],
+        "visualization": "graph",
+        "graphSettings": {
+          "type": 2,
+          "topContent": {
+            "columnMatch": "name",
+            "formatter": 13,
+            "formatOptions": {
+              "linkTarget": null,
+              "showIcon": true
+            }
+          },
+          "centerContent": {
+            "columnMatch": "location",
+            "formatter": 1,
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "style": "decimal",
+                "maximumFractionDigits": 2,
+                "maximumSignificantDigits": 3
+              }
+            }
+          },
+          "bottomContent": {
+            "columnMatch": "duration"
+          },
+          "nodeIdField": "name",
+          "graphOrientation": 3,
+          "showOrientationToggles": false,
+          "nodeSize": null,
+          "staticNodeSize": 100,
+          "colorSettings": {
+            "nodeColorField": "duration",
+            "type": 3,
+            "thresholdsGrid": [
+              {
+                "operator": ">=",
+                "thresholdValue": "2000",
+                "representation": "yellow"
+              },
+              {
+                "operator": "Default",
+                "thresholdValue": null,
+                "representation": "greenDark"
+              }
+            ]
+          },
+          "hivesMargin": 5
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "WebApp"
+      },
+      "name": "query - 2"
+    }
+  ],
+  "fallbackResourceIds": [
+    "azure monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
