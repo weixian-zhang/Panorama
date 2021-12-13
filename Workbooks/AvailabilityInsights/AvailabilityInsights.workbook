@@ -90,8 +90,8 @@
             "id": "02331b5d-4bf6-497e-ba15-2253d0cd18b0",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
-            "linkLabel": "Others",
-            "subTarget": "Others",
+            "linkLabel": "Arc View",
+            "subTarget": "ArcServers",
             "style": "link"
           }
         ]
@@ -208,11 +208,7 @@
         "resourceType": "microsoft.insights/components",
         "crossComponentResources": [
           "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-azworkbench-dev/providers/microsoft.insights/components/appinsights-azworkbench-dev",
-          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-azworkbench-dev/providers/microsoft.insights/components/appinsights-azworkbench-prod",
-          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-IsAzureIP-dev/providers/microsoft.insights/components/appinsights-func-azdcipfileloader-dev",
-          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-IsAzureIP-dev/providers/microsoft.insights/components/func-azdcipfileloader-dev",
-          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rggccshol/providers/microsoft.insights/components/webapp-asev3-internet",
-          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgML/providers/microsoft.insights/components/mlworkspacedp18723030776"
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rg-azworkbench-dev/providers/microsoft.insights/components/appinsights-azworkbench-prod"
         ],
         "visualization": "graph",
         "graphSettings": {
@@ -270,6 +266,151 @@
         "value": "WebApp"
       },
       "name": "query - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "{\"version\":\"AzureHealthQuery/1.0\",\"queryType\":\"Detailed\"}",
+        "size": 0,
+        "queryType": 4,
+        "resourceType": "microsoft.compute/virtualmachines",
+        "crossComponentResources": [
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Compute/virtualMachines/vm-appserver",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Compute/virtualMachines/vm-deploy-win10",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Compute/virtualMachines/vm-ml",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Compute/virtualMachines/vm-traffic-gen",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/RGGCCSHOL/providers/Microsoft.Compute/virtualMachines/vm-webserver",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgGCCSHOL/providers/Microsoft.Compute/virtualMachines/vmADDNS",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgWVD/providers/Microsoft.Compute/virtualMachines/vm-aadds-manage",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgWVD/providers/Microsoft.Compute/virtualMachines/vm-nv12sv3",
+          "/subscriptions/ee611083-4581-4ba1-8116-a502d4539206/resourceGroups/rgWVD/providers/Microsoft.Compute/virtualMachines/vm-sockteer"
+        ],
+        "visualization": "graph",
+        "graphSettings": {
+          "type": 2,
+          "topContent": {},
+          "centerContent": {
+            "columnMatch": "Name",
+            "formatter": 13,
+            "formatOptions": {
+              "linkTarget": null,
+              "showIcon": true
+            }
+          },
+          "nodeIdField": "Name",
+          "graphOrientation": 3,
+          "showOrientationToggles": false,
+          "nodeSize": null,
+          "staticNodeSize": 100,
+          "colorSettings": {
+            "nodeColorField": "Availability state",
+            "type": 3,
+            "thresholdsGrid": [
+              {
+                "operator": "!=",
+                "thresholdValue": "Available",
+                "representation": "red"
+              },
+              {
+                "operator": "Default",
+                "thresholdValue": null,
+                "representation": "greenDark"
+              }
+            ]
+          },
+          "hivesMargin": 5
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "WebApp"
+      },
+      "name": "query - 5"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Event\r\n| where Computer =~ \"vm-web\"\r\n| project Computer, _ResourceId, Source, EventLevelName, ParameterXml",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{LAWs}"
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "none",
+        "comparison": "isEqualTo",
+        "value": "none"
+      },
+      "name": "ArcServerEvents"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Resources\r\n| where type =~ \"Microsoft.HybridCompute/machines\"\r\n| where tags['from'] == 'On-Premise'\r\n| extend tagjson = parse_json(tags)\r\n| extend tier = tostring(tagjson.tier)\r\n| extend FromEnv = tostring(tagjson.from)\r\n| project id, name, tier, FromEnv",
+        "size": 0,
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "value::all"
+        ],
+        "visualization": "table"
+      },
+      "conditionalVisibility": {
+        "parameterName": "none",
+        "comparison": "isEqualTo",
+        "value": "none"
+      },
+      "name": "ArcResourceGraph"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "{\"version\":\"Merge/1.0\",\"merges\":[{\"id\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\",\"mergeType\":\"leftouter\",\"leftTable\":\"ArcServerEvents\",\"rightTable\":\"ArcResourceGraph\",\"leftColumn\":\"Computer\",\"rightColumn\":\"name\"}],\"projectRename\":[{\"originalName\":\"[ArcServerEvents].TenantId\",\"mergedName\":\"TenantId\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].TimeGenerated\",\"mergedName\":\"TimeGenerated\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].SourceSystem\",\"mergedName\":\"SourceSystem\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].Source\",\"mergedName\":\"Source\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].Computer\",\"mergedName\":\"Computer\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].EventLog\",\"mergedName\":\"EventLog\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].EventLevel\",\"mergedName\":\"EventLevel\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].EventLevelName\",\"mergedName\":\"EventLevelName\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].ParameterXml\",\"mergedName\":\"ParameterXml\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].EventData\",\"mergedName\":\"EventData\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].EventID\",\"mergedName\":\"EventID\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].RenderedDescription\",\"mergedName\":\"RenderedDescription\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].AzureDeploymentID\",\"mergedName\":\"AzureDeploymentID\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].Role\",\"mergedName\":\"Role\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].EventCategory\",\"mergedName\":\"EventCategory\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].UserName\",\"mergedName\":\"UserName\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].Message\",\"mergedName\":\"Message\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].MG\",\"mergedName\":\"MG\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].ManagementGroupName\",\"mergedName\":\"ManagementGroupName\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents].Type\",\"mergedName\":\"Type\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcServerEvents]._ResourceId\",\"mergedName\":\"_ResourceId\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].id\",\"mergedName\":\"id\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].name\",\"mergedName\":\"name\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].type\",\"mergedName\":\"type\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].tenantId\",\"mergedName\":\"tenantId\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].kind\",\"mergedName\":\"kind\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].location\",\"mergedName\":\"location\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].resourceGroup\",\"mergedName\":\"resourceGroup\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].subscriptionId\",\"mergedName\":\"subscriptionId\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].managedBy\",\"mergedName\":\"managedBy\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].sku\",\"mergedName\":\"sku\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].plan\",\"mergedName\":\"plan\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].tags\",\"mergedName\":\"Tags\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].properties\",\"mergedName\":\"properties\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].identity\",\"mergedName\":\"identity\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].zones\",\"mergedName\":\"zones\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].extendedLocation\",\"mergedName\":\"extendedLocation\",\"fromId\":\"225ef3b0-08ab-46e5-88ed-29c9046c20ad\"},{\"originalName\":\"[ArcResourceGraph].tier\",\"mergedName\":\"tier\",\"fromId\":\"unknown\"},{\"originalName\":\"[ArcResourceGraph].FromEnv\",\"mergedName\":\"FromEnv\",\"fromId\":\"unknown\"}]}",
+        "size": 0,
+        "queryType": 7,
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "_ResourceId",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "id",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "name",
+              "formatter": 5
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "tier",
+              "label": "Tier"
+            },
+            {
+              "columnId": "FromEnv",
+              "label": "From Environment"
+            }
+          ]
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "ArcServers"
+      },
+      "name": "MergedEventResourceGraph"
     }
   ],
   "fallbackResourceIds": [
